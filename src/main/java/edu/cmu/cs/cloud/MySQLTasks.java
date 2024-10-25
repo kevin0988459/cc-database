@@ -223,7 +223,7 @@ public class MySQLTasks {
      * </pre>
      */
     private static void q4() {
-        String sql = "";
+        String sql = "SELECT user_id FROM reviews WHERE cool = (SELECT MAX(cool) FROM reviews)";
         executeDataManipulationQuery(sql);
         printScannedRows(sql);
     }
