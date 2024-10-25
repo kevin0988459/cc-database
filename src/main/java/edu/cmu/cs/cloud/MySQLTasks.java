@@ -267,7 +267,7 @@ public class MySQLTasks {
      * You are only allowed to edit the sql.
      */
     private static void q6() {
-        String sql = "SELECT user_id FROM reviews " +
+        String sql = "SELECT DISTINCT user_id FROM reviews " +
                      "WHERE cool = (SELECT MAX(cool) FROM reviews) " +
                      "AND user_id IN (SELECT user_id FROM tips)";
         executeDataManipulationQuery(sql);
