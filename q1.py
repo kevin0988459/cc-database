@@ -60,8 +60,12 @@
 import MySQLdb
 import pandas as pd
 import sys
+import os
 
-conn = MySQLdb.connect(host='localhost', user='clouduser', passwd='dbroot', db='yelp_db')
+user = os.getenv('DB_USER')
+password = os.getenv('MYSQL_PWD')
+
+conn = MySQLdb.connect(host='localhost', user=user, passwd=password, db='yelp_db')
 query = "SELECT review_count, stars FROM businesses"
 df = pd.read_sql(query, con=conn)
 df.describe().to_csv(sys.stdout, encoding='utf-8', float_format='%.2f', header=False)
