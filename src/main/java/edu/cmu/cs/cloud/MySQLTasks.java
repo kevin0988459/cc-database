@@ -249,7 +249,7 @@ public class MySQLTasks {
      */
     private static void q5() {
         String sql = "SELECT name FROM businesses " +
-                     "WHERE neighborhood = 'South Side' AND name LIKE '%Coast%' " +
+                     "WHERE neighborhood = 'South Side' AND (name LIKE '% Coast %'" +
                      "AND business_id NOT IN (SELECT business_id FROM checkins)";
         executeDataManipulationQuery(sql);
     }
