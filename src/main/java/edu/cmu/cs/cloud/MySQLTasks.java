@@ -267,12 +267,9 @@ public class MySQLTasks {
      * You are only allowed to edit the sql.
      */
     private static void q6() {
-        String sql = "SELECT r.user_id " +
-                     "FROM reviews r " +
-                     "LEFT JOIN tips t ON r.user_id = t.user_id " +
-                     "WHERE t.user_id IS NOT NULL AND r.cool = (" +
-                     "    SELECT MAX(cool) FROM reviews" +
-                     ")";
+        String sql = "SELECT user_id FROM reviews " +
+                     "WHERE user_id IN (SELECT user_id FROM tips) " +
+                     "AND cool = (SELECT MAX(cool) FROM reviews WHERE user_id IN (SELECT user_id FROM tips))";
         executeDataManipulationQuery(sql);
     }
 
