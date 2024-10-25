@@ -171,7 +171,7 @@ public class MySQLTasks {
      * The index should be a single-column index instead of a composite index.
      */
     private static void q3() {
-        String sql = "";
+        String sql = "CREATE INDEX cool_i on reviews (cool) ";
         executeDataDefinitionQuery(sql);
         printIndexColumnNames("reviews");
     }
