@@ -153,7 +153,7 @@ public class MySQLTasks {
      */
     private static void q2() {
         dropCustomIndexesOnReviews();
-        String sql = "";
+        String sql = "SELECT user_id FROM reviews WHERE cool = (SELECT MAX(cool) FROM reviews)";
         executeDataManipulationQuery(sql);
         printScannedRows(sql);
     }
