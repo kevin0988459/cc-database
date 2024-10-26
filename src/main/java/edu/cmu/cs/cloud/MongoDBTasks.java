@@ -154,7 +154,7 @@ public class MongoDBTasks {
         Bson neighborhood = regex("neighborhood", "Shadyside", "i");
         Bson categories = regex("categories", "Asian Fusion", "i");
         Bson wifi = regex("attributes", "'WiFi': 'free'");
-        Bson bikeParking = eq("attributes.BikeParking", 1);
+        Bson bikeParking = regex("attributes", "'BikeParking':\\s*true", "i");
         Bson query = and(neighborhood, categories, wifi, bikeParking);
 
         try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
