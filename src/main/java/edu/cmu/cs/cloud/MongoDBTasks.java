@@ -150,15 +150,27 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q9() throws IOException {
-        Bson neighborhood = regrex("neighborhood", "Shadyside", "i");
-        Bson categories = regrex("categories", "Asian Fusion", "i");
+        Bson neighborhood = regex("neighborhood", "Shadyside", "i");
+        Bson categories = regex("categories", "Asian Fusion", "i");
         Bson wifi = eq("attributes.WiFi", "free");
         Bson bikeParking = eq("attributes.BikeParking", "true");
         Bson query = and(neighborhood, categories, wifi, bikeParking);
 
-        mongoCollection.find(query).forEach((Document document) -> {
-            System.out.println(document.getString("name"));
-    });
+        try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
+            if (!cursor.hasNext()) {
+            System.out.println("No matches found.");
+        }
+        while (cursor.hasNext()) {
+            Document doc = cursor.next();
+            String name = doc.getString("name"); // Assuming the name of the business is stored in the 'name' field
+            if (name != null) {
+                System.out.println(name);
+            }
+        }
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
