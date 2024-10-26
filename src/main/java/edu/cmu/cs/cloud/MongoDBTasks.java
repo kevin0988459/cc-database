@@ -156,7 +156,9 @@ public class MongoDBTasks {
         Bson bikeParking = eq("attributes.BikeParking", "true");
         Bson query = and(neighborhood, categories, wifi, bikeParking);
 
-        mongoCollection.find(query).forEach(document -> System.out.println(document.getString("name")));
+        mongoCollection.find(query).forEach((Document document) -> {
+            System.out.println(document.getString("name"));
+    });
     }
 
     /**
