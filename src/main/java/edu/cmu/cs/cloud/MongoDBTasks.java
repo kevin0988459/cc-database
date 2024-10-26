@@ -12,6 +12,7 @@ import java.io.IOException;
 import com.mongodb.client.MongoCursor;
 
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.regex;
 
 
@@ -153,12 +154,24 @@ public class MongoDBTasks {
         Bson neighborhood = regex("neighborhood", "Shadyside", "i");
         Bson categories = regex("categories", "Asian Fusion", "i");
         Bson wifi = regex("attributes", "'WiFi': 'free'");
-        Bson bikeParking = regex("attributes", "'BikeParking': true");
+        Bson bikeParking = eq("attributes.BikeParking", true);
         Bson query = and(neighborhood, categories, wifi, bikeParking);
 
-        Document doc = mongoCollection.find(query).first();
-        String name = doc.getString("name");
-        System.out.println(name);
+        try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
+            if (!cursor.hasNext()) {
+            System.out.println("No matches found.");
+        }
+        while (cursor.hasNext()) {
+            Document doc = cursor.next();
+            String name = doc.getString("name"); // Assuming the name of the business is stored in the 'name' field
+            if (name != null) {
+                System.out.println(name);
+            }
+        }
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
