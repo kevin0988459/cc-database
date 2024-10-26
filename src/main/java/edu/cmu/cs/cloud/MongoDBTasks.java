@@ -156,21 +156,15 @@ public class MongoDBTasks {
         Bson wifi = eq("attributes.WiFi", "free");
         Bson bikeParking = eq("attributes.BikeParking", true);
         Bson query = and(neighborhood, categories, wifi, bikeParking);
-
-        try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
-            if (!cursor.hasNext()) {
-            System.out.println("No matches found.");
-        }
-        while (cursor.hasNext()) {
-            Document doc = cursor.next();
-            String name = doc.getString("name"); // Assuming the name of the business is stored in the 'name' field
+        
+        Document doc = mongoCollection.find(query).first();
+        if (doc != null) {
+            String name = doc.getString("name");
             if (name != null) {
                 System.out.println(name);
             }
-        }
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-            e.printStackTrace();
+        } else {
+            System.out.println("No matches found.");
         }
     }
 
