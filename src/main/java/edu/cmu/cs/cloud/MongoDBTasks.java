@@ -247,7 +247,7 @@ public class MongoDBTasks {
         Bson insuranceFilter = regex("attributes", "'AcceptsInsurance':\\s*True", "i");
         Bson appointmentsOnlyFilter = regex("attributes", "'ByAppointmentOnly':\\s*True", "i");
         Bson starRatingFilter = gte("stars", 4.0);
-        Bson cityFilter = eq("city", "Ahwatukee");
+        Bson cityFilter = regex("city", "Ahwatukee");
         Bson query = and(categoryFilter, insuranceFilter, appointmentsOnlyFilter, cityFilter);
         try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
             if (!cursor.hasNext()) {
