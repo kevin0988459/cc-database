@@ -285,24 +285,17 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q12() throws Throwable {
-        try {
-            List<Bson> aggpipline = Arrays.asList(
-                Aggregates.group("$city"),
-                Aggregates.count("uniqueCityCount")
-            );
+        List<Bson> aggpipline = Arrays.asList(
+            Aggregates.group("$city"),
+            Aggregates.count("uniqueCityCount")
+        );
 
-            AggregateIterable<Document> result = mongoCollection.aggregate(aggpipline);
-
-            Document doc = result.first();
-
-            if (doc != null && doc.containsKey("uniqueCityCount")) {
-                System.out.println(doc.getInteger("uniqueCityCount"));
-            } else {
-                System.out.println("0");
-            }
-        } catch (Exception e) {
-            System.err.println("An error occurred while counting unique cities: " + e.getMessage());
-            e.printStackTrace();
+        AggregateIterable<Document> result = mongoCollection.aggregate(aggpipline);
+        Document doc = result.first();
+        
+        if (doc != null && doc.containsKey("uniqueCityCount")) {
+            System.out.println(doc.getInteger("uniqueCityCount"));
+        } else {
+            System.out.println("0");
         }
-    }
 }
