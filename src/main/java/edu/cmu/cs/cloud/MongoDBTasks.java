@@ -153,7 +153,7 @@ public class MongoDBTasks {
     private static void q9() throws IOException {
         Bson neighborhood = regex("neighborhood", "Shadyside", "i");
         Bson categories = regex("categories", "Asian Fusion", "i");
-        Bson wifi = regex("attributes.WiFi", "free");
+        Bson wifi = eq("attributes.WiFi", "free");
         Bson bikeParking = eq("attributes.BikeParking", true);
         Bson query = and(neighborhood, categories, wifi, bikeParking);
 
