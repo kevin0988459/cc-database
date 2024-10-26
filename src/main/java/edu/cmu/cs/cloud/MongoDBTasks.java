@@ -148,8 +148,13 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q9() throws IOException {
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        BSON neighborhood = regrex("neighborhood", "Shadyside", "i");
+        BSON categories = regrex("categories", "Asian Fusion", "i");
+        BSON wifi = eq("attributes.WiFi", "free");
+        BSON bikeParking = eq("attributes.BikeParking", "true");
+        BSON query = and(neighborhood, categories, wifi, bikeParking);
+
+        mongoCollection.find(query).forEach(document -> System.out.println(document.getString("name")));
     }
 
     /**
