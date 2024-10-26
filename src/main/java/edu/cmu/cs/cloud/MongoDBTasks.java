@@ -155,17 +155,12 @@ public class MongoDBTasks {
         Bson categories = regex("categories", "Asian Fusion", "i");
         Bson wifi = eq("attributes.WiFi", "free");
         Bson bikeParking = eq("attributes.BikeParking", true);
-        Bson query = and(neighborhood, categories, wifi, bikeParking);
-        
+        Bson query = and(neighborhood, categories, wifi);
+
         Document doc = mongoCollection.find(query).first();
-        if (doc != null) {
-            String name = doc.getString("name");
-            if (name != null) {
-                System.out.println(name);
-            }
-        } else {
-            System.out.println("No matches found.");
-        }
+        String name = doc.getString("name");
+        System.out.println(name);
+            
     }
 
     /**
