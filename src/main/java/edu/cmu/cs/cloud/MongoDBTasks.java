@@ -1,5 +1,6 @@
 package edu.cmu.cs.cloud;
-
+import java.util.Arrays;
+import java.util.List;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -11,12 +12,16 @@ import org.bson.conversions.Bson;
 import java.io.IOException;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.model.Aggregates;
 
 import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.regex;
 import static com.mongodb.client.model.Filters.gte;
+
+
 
 public class MongoDBTasks {
     /**
@@ -280,7 +285,24 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q12() throws Throwable {
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        try {
+            List<Bson> aggpipline = Arrays.asList(
+                Aggregates.group("$city"),
+                Aggregates.count("uniqueCityCount")
+            );
+
+            AggregateIterable<Document> result = mongoCollection.aggregate(aggpipline);
+
+            Document doc = result.first();
+
+            if (doc != null && doc.containsKey("uniqueCityCount")) {
+                System.out.println(doc.getInteger("uniqueCityCount"));
+            } else {
+                System.out.println("0");
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred while counting unique cities: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
