@@ -208,7 +208,7 @@ public class MongoDBTasks {
         Bson nameFilter = regex("name", "India", "i");
         Bson neighborhoodFilter = or(regex("neighborhood", "Downtown", "i"), regex("neighborhood", "Oakland", "i"));
         Bson cityFilter = eq("city", "Pittsburgh");
-        Bson hoursFilter = regex("hours.Friday", "17:00");
+        Bson hoursFilter = regex("hours", ".*'Friday':\\s*'17:00-.*");
         Bson deliveryFilter = regex("attributes", "'RestaurantsDelivery':\\s*true", "i");
         Bson query = and(nameFilter, neighborhoodFilter, cityFilter,  deliveryFilter);
 
