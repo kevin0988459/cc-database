@@ -242,8 +242,28 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q11() throws IOException {
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        Bson categoryFilter = regex("categories", "Dental", "i");
+        Bson insuranceFilter = eq("attributes.Insurance", true);
+        Bson appointmentsOnlyFilter = eq("attributes.AppointmentsOnly", true);
+        Bson starRatingFilter = gte("stars", 4.0);
+        Bson cityFilter = eq("city", "Ahwatukee");
+        Bson query = and(categoryFilter);
+        try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
+            if (!cursor.hasNext()) {
+                System.out.println("No matches found.");
+            }
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
+                String name = doc.getString("name");
+                String address = doc.getString("address");
+                if (name != null && address != null) {
+                    System.out.println("Name: " + name + ", Address: " + address);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
