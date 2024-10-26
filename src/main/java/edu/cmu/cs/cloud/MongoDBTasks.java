@@ -210,7 +210,7 @@ public class MongoDBTasks {
         Bson cityFilter = eq("city", "Pittsburgh");
         Bson hoursFilter = regex("hours", ".*'Friday':\\s*'17:00-.*");
         Bson deliveryFilter = regex("attributes", "'RestaurantsDelivery':\\s*true", "i");
-        Bson query = and(nameFilter, neighborhoodFilter, cityFilter,  deliveryFilter);
+        Bson query = and(nameFilter, neighborhoodFilter, cityFilter, hoursFilter, deliveryFilter);
 
         try (MongoCursor<Document> cursor = mongoCollection.find(query).sort(Sorts.ascending("name")).iterator()) {
             if (!cursor.hasNext()) {
