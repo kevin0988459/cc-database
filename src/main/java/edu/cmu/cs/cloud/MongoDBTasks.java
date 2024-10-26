@@ -204,8 +204,28 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q10() throws IOException {
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        Bson nameFilter = regex("name", "India", "i");
+        Bson neighborhoodFilter = or(regex("neighborhood", "Downtown", "i"), regex("neighborhood", "Oakland", "i"));
+        Bson cityFilter = eq("city", "Pittsburgh");
+        Bson hoursFilter = regex("hours.Friday", "^17:00", "i");
+        Bson deliveryFilter = eq("attributes.RestaurantsDelivery", true);
+        Bson query = and(nameFilter, neighborhoodFilter, cityFilter, hoursFilter, deliveryFilter);
+
+        try (MongoCursor<Document> cursor = mongoCollection.find(query).sort(Sorts.ascending("name")).iterator()) {
+            if (!cursor.hasNext()) {
+                System.out.println("No matches found.");
+            }
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
+                String name = doc.getString("name");
+                if (name != null) {
+                    System.out.println(name);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
