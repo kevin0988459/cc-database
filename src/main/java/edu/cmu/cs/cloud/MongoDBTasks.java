@@ -243,12 +243,12 @@ public class MongoDBTasks {
      * list and/or return type.
      */
     private static void q11() throws IOException {
-        Bson categoryFilter = regex("categories", "Dental", "i");
+        Bson categoryFilter = regex("categories", "Dentists", "i");
         Bson insuranceFilter = regex("attributes", "'AcceptsInsurance':\\s*True", "i");
         Bson appointmentsOnlyFilter = regex("attributes", "'ByAppointmentOnly':\\s*True", "i");
         Bson starRatingFilter = gte("stars", 4.0);
         Bson cityFilter = regex("city", "Ahwatukee");
-        Bson query = and(categoryFilter, insuranceFilter, appointmentsOnlyFilter, cityFilter);
+        Bson query = and(categoryFilter, insuranceFilter, appointmentsOnlyFilter, starRatingFilter,cityFilter);
         try (MongoCursor<Document> cursor = mongoCollection.find(query).iterator()) {
             if (!cursor.hasNext()) {
                 System.out.println("No matches found.");
