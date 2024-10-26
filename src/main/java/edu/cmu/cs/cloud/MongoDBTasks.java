@@ -292,10 +292,11 @@ public class MongoDBTasks {
 
         AggregateIterable<Document> result = mongoCollection.aggregate(aggpipline);
         Document doc = result.first();
-        
+
         if (doc != null && doc.containsKey("uniqueCityCount")) {
             System.out.println(doc.getInteger("uniqueCityCount"));
         } else {
             System.out.println("0");
         }
+    }
 }
