@@ -11,6 +11,7 @@ import org.bson.conversions.Bson;
 import java.io.IOException;
 import com.mongodb.client.MongoCursor;
 
+import static com.mongodb.client.model.Filters.or;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.regex;
