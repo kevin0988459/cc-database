@@ -32,7 +32,7 @@ public class RedisLock {
         setParams.nx().px(ttl);
         String uuid = java.util.UUID.randomUUID().toString();
         String result = jedis.set(lockKey, uuid, setParams);
-        if ('OK'.equals(result)) {
+        if ("OK".equals(result)) {
             return true;
         }
         return false;
@@ -52,6 +52,6 @@ public class RedisLock {
             return false;
         }
         jedis.del(lockKey);
-        return true
+        return true;
     }
 }
