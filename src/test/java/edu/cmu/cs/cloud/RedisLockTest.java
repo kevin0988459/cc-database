@@ -74,37 +74,71 @@ class RedisLockTest {
 
     @Test
     void acquireLockFailure() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
+        assertFalse(redisLock.acquireLock("lockKey", 1000L));
     }
 
     @Test
     void acquireLockMultipleFailure() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        // Acquire multiple locks
+        assertTrue(redisLock.acquireLock("lockKey1", 1000L));
+        assertTrue(redisLock.acquireLock("lockKey2", 1000L));
+        // Attempt to reacquire the same locks
+        assertFalse(redisLock.acquireLock("lockKey1", 1000L));
+        assertFalse(redisLock.acquireLock("lockKey2", 1000L));
     }
 
     @Test
     void releaseLockSuccess() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        assertTrue(redisLock.releaseLock("lockKey"), "Lock release should succeed.");
+        // Verify that the lock is released by attempting to acquire it again
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after release.");
     }
 
     @Test
     void releaseLockFailure() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        // Attempt to release a lock that hasn't been acquired
+        assertFalse(redisLock.releaseLock("lockKey"));
     }
 
     @Test
     void lockExpiration() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        // Wait for the lock to expire
+        Thread.sleep(1500L);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after expiration.");
+        
     }
 
     @Test
     void aquireAndRelease() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        assertTrue(redisLock.releaseLock("lockKey"), "Lock release should succeed.");
+        // Ensure the lock can be acquired again
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after release.");
     }
 
     @Test
     void releaseAfterTimeout() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        RedisLock redisLock = new RedisLock(jedis);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        Thread.sleep(1500L);
+        assertFalse(redisLock.releaseLock("lockKey"), "Releasing a lock after timeout should fail.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after expiration.");
     }
 }
 

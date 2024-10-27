@@ -30,8 +30,25 @@ public class Server {
      * @return true if the reservation was successful, false otherwise.
      */
     public boolean reserve(String resourceID, Integer userID) {
-        // TODO: complete this function
-        throw new RuntimeException("To be implemented");
+        String lockKey = "lock:" + resourceID;
+        Long ttl = 30000L;
+        boolean lockAcquired = lock.acquireLock(lockKey, ttl);
+        if (!lockAcquired) {
+            return false; // Couldn't acquire lock, resource is being processed
+        }
+
+        try {
+            String resourceKey = "resource:" + resourceID;
+            String currentUser = jedis.get(resourceKey);
+            if (currentUser == null) {
+                jedis.set(resourceKey, userID.toString());
+                return true;
+            } else {
+                return false; // Resource is already reserved
+            }
+        } finally {
+            lock.releaseLock(lockKey);
+        }
     }
 
     /**
@@ -42,7 +59,24 @@ public class Server {
      * @return true if the checkout was successful, false otherwise.
      */
     public boolean checkout(String resourceID, Integer userID) {
-        // TODO: complete this function
-        throw new RuntimeException("To be implemented");
+        String lockKey = "lock:" + resourceID;
+        Long ttl = 30000L; // 30 seconds
+        boolean lockAcquired = lock.acquireLock(lockKey, ttl);
+        if (!lockAcquired) {
+            return false;
+        }
+
+        try {
+            String resourceKey = "resource:" + resourceID;
+            String currentUser = jedis.get(resourceKey);
+            if (currentUser != null && currentUser.equals(userID.toString())) {
+                jedis.del(resourceKey);
+                return true;
+            } else {
+                return false; // Resource reserved by other user
+            }
+        } finally {
+            lock.releaseLock(lockKey);
+        }
     }
 }

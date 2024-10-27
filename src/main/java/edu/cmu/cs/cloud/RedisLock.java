@@ -29,9 +29,13 @@ public class RedisLock {
     public boolean acquireLock(String lockKey, Long ttl) {
         // used to set any additional options for the redis command
         SetParams setParams = new SetParams(); 
-        // TODO: complete this function
-        String result = jedis.set("", "", setParams);
-        throw new RuntimeException("To be implemented");
+        setParams.nx().px(ttl);
+        String uuid = java.util.UUID.randomUUID().toString();
+        String result = jedis.set(lockKey, uuid, setParams);
+        if ('OK'.equals(result)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -43,7 +47,11 @@ public class RedisLock {
      * @return true if the lock was successfully released, false otherwise.
      */
     public boolean releaseLock(String lockKey) {
-        // TODO: complete this function
-        throw new RuntimeException("To be implemented");
+        String currentValue = jedis.get(lockKey);
+        if (currentValue == null) {
+            return false;
+        }
+        jedis.del(lockKey);
+        return true
     }
 }

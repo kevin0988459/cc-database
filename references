@@ -6,6 +6,12 @@
       "url":"<https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.describe.html>",
       "code":"<q1 get descriptive statistics>",
       "description":"<>"
+    },
+    {
+      "title":"<Jedis guide>",
+      "url":"<https://redis.io/docs/latest/develop/connect/clients/java/jedis/>",
+      "code":"<how to set and del lock>",
+      "description":"<>"
     }
   ]
 }

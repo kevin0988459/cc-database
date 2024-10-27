@@ -58,31 +58,62 @@ class ServerTest {
 
     @Test
     void reserveOccupiedResource() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        //double reserver on the same resource
+        assertTrue(server.reserve("resource1", 1));
+        assertFalse(server.reserve("resource1", 2));
     }
 
     @Test
     void checkoutOccupiedAndOwnedResource() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        assertTrue(server.reserve("resource1", 1));
+        assertTrue(server.checkout("resource1", 1));
+        assertFalse(jedis.exists("resource:resource1"));
     }
 
     @Test
     void checkoutEmptyResource() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        assertFalse(server.checkout("resource1", 1));
     }
 
     @Test
     void checkoutUnownedResource() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        assertTrue(server.reserve("resource1", 1));
+        assertFalse(server.checkout("resource1", 2));
     }
 
     @Test
     void reserveAndCheckout() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        assertTrue(server.reserve("resource1", 1));
+        assertTrue(server.checkout("resource1", 1));
+        assertFalse(server.checkout("resource1", 1));
     }
 
     @Test
     void reserveAndCheckoutMultipleResources() {
-        throw new RuntimeException("add test cases on your own");
+        Jedis jedis = jedisPool.getResource();
+        Server server = new Server(jedis);
+        jedis.flushAll();
+        // Reserve  resources
+        assertTrue(server.reserve("resource1", 1));
+        assertTrue(server.reserve("resource2", 2));
+
+        // Checkout resources
+        assertTrue(server.checkout("resource1", 1));
+        assertTrue(server.checkout("resource2", 2));
     }
 }
