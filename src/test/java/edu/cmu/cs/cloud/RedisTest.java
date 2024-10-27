@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -130,6 +132,7 @@ class RedisTest {
     void hgetall() {
         Redis redisClient = new Redis();
 
+        List<String> result = redisClient.hgetall("nonExistingHash");
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
