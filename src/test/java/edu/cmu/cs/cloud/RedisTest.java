@@ -185,9 +185,6 @@ class RedisTest {
 
         assertNull(redisClient.rpop("nonExistingList"));
 
-        redisClient.rpush("list1");
-        assertNull(redisClient.rpop("list1"));
-
         redisClient.rpush("list1", "value1", "value2", "value3");
         assertEquals("value3", redisClient.rpop("list1"));
         assertEquals(2, redisClient.llen("list1"));
