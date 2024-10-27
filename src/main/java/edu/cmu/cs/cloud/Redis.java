@@ -312,7 +312,7 @@ public class Redis {
         checkType(k, LIST);
         @SuppressWarnings("unchecked")
         LinkedList<String> list = (LinkedList<String>) store.get(k);
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return null;
         }
         return list.removeLast();
