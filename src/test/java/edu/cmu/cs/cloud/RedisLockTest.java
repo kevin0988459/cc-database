@@ -135,7 +135,7 @@ class RedisLockTest {
     void releaseAfterTimeout() {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L),);
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
         Thread.sleep(1500L);
         assertFalse(redisLock.releaseLock("lockKey"));
         assertTrue(redisLock.acquireLock("lockKey", 1000L));
