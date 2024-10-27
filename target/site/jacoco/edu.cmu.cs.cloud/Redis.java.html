@@ -312,7 +312,7 @@ import java.util.List;
 <span class="fc" id="L312">        checkType(k, LIST);</span>
         @SuppressWarnings(&quot;unchecked&quot;)
 <span class="fc" id="L314">        LinkedList&lt;String&gt; list = (LinkedList&lt;String&gt;) store.get(k);</span>
-<span class="fc bfc" id="L315" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="pc bpc" id="L315" title="1 of 4 branches missed.">        if (list == null || list.isEmpty()) {</span>
 <span class="fc" id="L316">            return null;</span>
         }
 <span class="fc" id="L318">        return list.removeLast();</span>
