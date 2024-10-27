@@ -96,10 +96,10 @@ class RedisLockTest {
     void releaseLockSuccess() {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
-        assertTrue(redisLock.releaseLock("lockKey"), "Lock release should succeed.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
+        assertTrue(redisLock.releaseLock("lockKey"));
         // Verify that the lock is released by attempting to acquire it again
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after release.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
     }
 
     @Test
@@ -114,10 +114,10 @@ class RedisLockTest {
     void lockExpiration() {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
         // Wait for the lock to expire
         Thread.sleep(1500L);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after expiration.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
         
     }
 
@@ -125,20 +125,20 @@ class RedisLockTest {
     void aquireAndRelease() {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
-        assertTrue(redisLock.releaseLock("lockKey"), "Lock release should succeed.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
+        assertTrue(redisLock.releaseLock("lockKey"));
         // Ensure the lock can be acquired again
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after release.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
     }
 
     @Test
     void releaseAfterTimeout() {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock acquisition should succeed.");
+        assertTrue(redisLock.acquireLock("lockKey", 1000L),);
         Thread.sleep(1500L);
-        assertFalse(redisLock.releaseLock("lockKey"), "Releasing a lock after timeout should fail.");
-        assertTrue(redisLock.acquireLock("lockKey", 1000L), "Lock should be reacquired after expiration.");
+        assertFalse(redisLock.releaseLock("lockKey"));
+        assertTrue(redisLock.acquireLock("lockKey", 1000L));
     }
 }
 
