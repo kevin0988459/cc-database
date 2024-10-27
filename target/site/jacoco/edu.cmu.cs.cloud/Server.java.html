@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Server.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">Server.java</span></div><h1>Server.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import redis.clients.jedis.Jedis;
+
+/**
+ * A server class that manages resource reservation and checkout using Redis.
+ */
+public class Server {
+    private Jedis jedis;
+    private RedisLock lock;
+
+    /**
+     * Constructs a Server with the specified Jedis client.
+     *
+     * @param jedis The Jedis client to use for Redis operations.
+     */
+<span class="nc" id="L17">    public Server(Jedis jedis) {</span>
+<span class="nc" id="L18">        this.jedis = jedis;</span>
+<span class="nc" id="L19">        this.lock = new RedisLock(jedis);</span>
+<span class="nc" id="L20">    }</span>
+
+    /**
+     * Attempts to reserve a resource for a user. This function should
+     * return true if and only if the resource was available for reservation.
+     * If the function is unable to complete a reservation, it should return
+     * immediatly.
+     *
+     * @param resourceID The ID of the resource to reserve.
+     * @param userID The ID of the user attempting to reserve the resource.
+     * @return true if the reservation was successful, false otherwise.
+     */
+    public boolean reserve(String resourceID, Integer userID) {
+        // TODO: complete this function
+<span class="nc" id="L34">        throw new RuntimeException(&quot;To be implemented&quot;);</span>
+    }
+
+    /**
+     * Attempts to checkout (release) a resource for a user.
+     *
+     * @param resourceID The ID of the resource to checkout.
+     * @param userID The ID of the user attempting to checkout the resource.
+     * @return true if the checkout was successful, false otherwise.
+     */
+    public boolean checkout(String resourceID, Integer userID) {
+        // TODO: complete this function
+<span class="nc" id="L46">        throw new RuntimeException(&quot;To be implemented&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

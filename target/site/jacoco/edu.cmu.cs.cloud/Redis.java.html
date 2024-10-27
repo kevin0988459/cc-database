@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Redis.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">Redis.java</span></div><h1>Redis.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * A simplified version of Redis.
+ *
+ * This is simplified in the aspects including but not limited to:
+ * 1. This program only covers the three most basic data structures with a
+ * subset of the storage commands.
+ * 2. This program is single-node.
+ * 3. This program is not thread-safe.
+ *
+ * You can use &lt;a href=&quot;http://try.redis.io/&quot;&gt;Try Redis&lt;/a&gt; as the reference
+ * Redis interface.
+ *
+ * You are not allowed to use a 3rd-party library.
+ * Only &lt;a href=&quot;https://docs.oracle.com/javase/8/docs/api/&quot;&gt;built-in APIs
+ * of Java SE 8&lt;/a&gt; are allowed to import.
+ */
+<span class="fc" id="L23">public class Redis {</span>
+
+    /**
+     * We will implement the three most basic data structures supported in
+     * Redis.
+     *
+     * Redis Strings.
+     * It is the only data type in Memcached.
+     * {@link #set(String, String)}
+     * {@link #get(String)}
+     *
+     * Redis Hashes.
+     * {@link #hset(String, String, String)}
+     * {@link #hget(String, String)}
+     * {@link #hgetall(String)}
+     *
+     * Redis Lists.
+     * Redis lists are implemented via {@link LinkedList}.
+     * For a database system it is crucial to be able to add elements to a
+     * very long list in a very fast way.
+     * {@link #rpop(String)}
+     * {@link #rpush(String, String...)}
+     * {@link #llen(String)}
+     *
+     * General operations.
+     * {@link #del(String...)}
+     *
+     * Please implement the unfinished functions, which are marked by
+     * {@code new UnsupportedOperationException(&quot;Waiting to be implemented&quot;)}
+     *
+     * Throw {@link UnsupportedOperationException} when performing an
+     * operation against the wrong type given a key using
+     * {@link #checkType(String, String)}.
+     */
+<span class="fc" id="L57">    private HashMap&lt;String, Object&gt; store = new HashMap&lt;&gt;();</span>
+
+    /**
+     * The exception message when performing an operation against the wrong
+     * type given a key.
+     */
+    private static final String WRONG_TYPE_MESSAGE =
+            &quot;WRONGTYPE Operation against a key holding the wrong kind of value&quot;;
+    /**
+     * The string representation of the types of the value supported by Redis.
+     */
+    private static final String STRING = &quot;string&quot;;
+    private static final String HASH = &quot;hash&quot;;
+    private static final String LIST = &quot;list&quot;;
+
+    /**
+     * Unknown type, used in {@link #type(String)}.
+     */
+    private static final String UNKNOWN = &quot;unknown&quot;;
+
+    /**
+     * The string representation of when the key does not exist.
+     */
+    private static final String NONE = &quot;none&quot;;
+
+    /**
+     * Returns the string representation of the type of the value stored at
+     * key.
+     *
+     * The different types that can be returned are: string, list and hash.
+     *
+     * @param k key
+     * @return the type of the value stored at key, or &quot;none&quot; when the key does
+     * not exist.
+     * @see &lt;a href=&quot;https://redis.io/commands/type&quot;&gt;TYPE - Redis&lt;/a&gt;
+     */
+    public String type(String k) {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (store.containsKey(k)) {</span>
+<span class="fc" id="L95">            Object v = store.get(k);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">            if (v instanceof String) {</span>
+<span class="fc" id="L97">                return STRING;</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">            } else if (v instanceof HashMap) {</span>
+<span class="fc" id="L99">                return HASH;</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            } else if (v instanceof List) {</span>
+<span class="fc" id="L101">                return LIST;</span>
+            } else {
+<span class="fc" id="L103">                return UNKNOWN;</span>
+            }
+        }
+<span class="fc" id="L106">        return NONE;</span>
+    }
+
+    /**
+     * Set key to hold the string value.
+     *
+     * SET will replace any existing value already stored into the key, in the
+     * case that the key already exists, even if the key is associated with a
+     * non-string value.
+     *
+     * @param k key
+     * @param v string value
+     * @return &quot;OK&quot; to indicate SET was executed correctly
+     * @see &lt;a href=&quot;https://redis.io/commands/set&quot;&gt;SET - Redis&lt;/a&gt;
+     */
+    public String set(String k, String v) {
+<span class="fc" id="L122">        store.put(k, v);</span>
+<span class="fc" id="L123">        return &quot;OK&quot;;</span>
+    }
+
+    /**
+     * Check if the value stored at key matches the type.
+     *
+     * type: STRING HASH LIST
+     *
+     * Throws {@link UnsupportedOperationException} if the value
+     * stored at key exists but does not match the type.
+     *
+     * @param k    key
+     * @param type to check
+     */
+    void checkType(String k, String type) {
+<span class="fc bfc" id="L138" title="All 4 branches covered.">        if (!type(k).equals(NONE) &amp;&amp; !type(k).equals(type)) {</span>
+<span class="fc" id="L139">            throw new UnsupportedOperationException(WRONG_TYPE_MESSAGE);</span>
+        }
+<span class="fc" id="L141">    }</span>
+
+    /**
+     * Get the string value of key.
+     *
+     * An error is returned if the value stored at key is not a string,
+     * because GET only handles string values.
+     *
+     * @param k the key
+     * @return the string value if the key exists,
+     * or null when key does not exist
+     * @see &lt;a href=&quot;https://redis.io/commands/get&quot;&gt;GET - Redis&lt;/a&gt;
+     */
+    public String get(String k) {
+<span class="fc" id="L155">        checkType(k, STRING);</span>
+<span class="fc" id="L156">        return (String) store.get(k);</span>
+    }
+
+    /**
+     * Removes the specified keys. E.g. {@code del(key1, key2, key3)}
+     *
+     * A key is ignored if it does not exist.
+     *
+     * @param ks keys to remove
+     * @return the number of keys that were removed
+     * @see &lt;a href=&quot;https://redis.io/commands/del&quot;&gt;DEL - Redis&lt;/a&gt;
+     */
+    public int del(String... ks) {
+<span class="fc" id="L169">        int n = 0;</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        for (String k : ks) {</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">            if (store.containsKey(k)) {</span>
+<span class="fc" id="L172">                store.remove(k);</span>
+<span class="fc" id="L173">                n++;</span>
+            }
+        }
+<span class="fc" id="L176">        return n;</span>
+    }
+
+
+    /**
+     * Sets field in the hash stored at key to value.
+     *
+     * If key does not exist, a new key holding a hash is created.
+     *
+     * If field already exists in the hash, it is overwritten.
+     *
+     * @param k key
+     * @param f field
+     * @param v value
+     * @return 1 if field is a new field in the hash and value was set,
+     * 0 if field already exists in the hash and the value was updated.
+     * @see &lt;a href=&quot;https://redis.io/commands/hset&quot;&gt;HSET - Redis&lt;/a&gt;
+     */
+    public int hset(String k, String f, String v) {
+<span class="fc" id="L195">        checkType(k, HASH);</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L197">        HashMap&lt;String, String&gt; m = (HashMap&lt;String, String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        if (m == null) {</span>
+<span class="fc" id="L199">            m = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L200">            store.put(k, m);</span>
+        }
+<span class="fc" id="L202">        int initialSize = m.size();</span>
+<span class="fc" id="L203">        m.put(f, v);</span>
+<span class="fc" id="L204">        int finalSize = m.size();</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">        return finalSize &gt; initialSize ? 1 : 0;</span>
+    }
+
+    /**
+     * Returns the value associated with field in the hash stored at key.
+     *
+     * @param k key
+     * @param f field
+     * @return the value associated with field, or null when field is not
+     * present in the hash or key does not exist.
+     * @see &lt;a href=&quot;https://redis.io/commands/hget&quot;&gt;HGET - Redis&lt;/a&gt;
+     */
+    public String hget(String k, String f) {
+<span class="fc" id="L218">        checkType(k, HASH);</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L220">        HashMap&lt;String, String&gt; m = (HashMap&lt;String, String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        if (m == null) {</span>
+<span class="fc" id="L222">            return null;</span>
+        }
+<span class="fc" id="L224">        return m.get(f);</span>
+    }
+
+    /**
+     * Returns all fields and values of the hash stored at key.
+     *
+     * In the returned value, every field name is followed by its value, so the
+     * length of the reply is twice the size of the hash.
+     *
+     * @param k key
+     * @return a list of fields and their values stored in the hash,
+     * or an empty list when key does not exist.
+     * @see &lt;a href=&quot;https://redis.io/commands/hgetall&quot;&gt;HGETALL - Redis&lt;/a&gt;
+     */
+    public List&lt;String&gt; hgetall(String k) {
+<span class="fc" id="L239">        checkType(k, HASH);</span>
+<span class="fc" id="L240">        List&lt;String&gt; list = new LinkedList&lt;&gt;();</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L242">        HashMap&lt;String, String&gt; m = (HashMap&lt;String, String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (m == null) {</span>
+<span class="fc" id="L244">            return list;</span>
+        }
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        for (HashMap.Entry&lt;String, String&gt; entry: m.entrySet()) {</span>
+<span class="fc" id="L247">            list.add(entry.getKey());</span>
+<span class="fc" id="L248">            list.add(entry.getValue());</span>
+<span class="fc" id="L249">        }</span>
+<span class="fc" id="L250">        return list;</span>
+    }
+
+    /**
+     * Returns the length of the list stored at key.
+     *
+     * If key does not exist, it is interpreted as an empty list and 0 is
+     * returned. An error is returned when the value stored at key is not a
+     * list.
+     *
+     * @param k key
+     * @return the length of the list at key
+     * @see &lt;a href=&quot;https://redis.io/commands/llen&quot;&gt;LLEN - Redis&lt;/a&gt;
+     */
+    public int llen(String k) {
+<span class="fc" id="L265">        checkType(k, LIST);</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L267">        LinkedList&lt;String&gt; list = (LinkedList&lt;String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="fc" id="L269">            return 0;</span>
+        }
+<span class="fc" id="L271">        return list.size();</span>
+    }
+
+    /**
+     * Insert all the specified values at the tail of the list stored at key.
+     *
+     * If key does not exist, it is created as an empty list before performing the
+     * push operation.
+     *
+     * When key holds a value that is not a list, an error is returned.
+     *
+     * @param k  key
+     * @param vs values
+     * @return the length of the list after the push operation
+     * @see &lt;a href=&quot;https://redis.io/commands/rpush&quot;&gt;RPUSH - Redis&lt;/a&gt;
+     */
+    public int rpush(String k, String... vs) {
+<span class="fc" id="L288">        checkType(k, LIST);</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L290">        LinkedList&lt;String&gt; list = (LinkedList&lt;String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="fc" id="L292">            list = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L293">            store.put(k, list);</span>
+        }
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        for (String v: vs) {</span>
+<span class="fc" id="L296">            list.addLast(v);</span>
+        }
+<span class="fc" id="L298">        return list.size();</span>
+    }
+
+    /**
+     * Removes and returns the last element of the list stored at key.
+     *
+     * When key holds a value that is not a list, an error is returned.
+     * If the list is empty, null value will be returned
+     *
+     * @param k the key
+     * @return the value of the last element, or null when key does not exist.
+     * @see &lt;a href=&quot;https://redis.io/commands/rpop&quot;&gt;RPOP - Redis&lt;/a&gt;
+     */
+    public String rpop(String k) {
+<span class="fc" id="L312">        checkType(k, LIST);</span>
+        @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L314">        LinkedList&lt;String&gt; list = (LinkedList&lt;String&gt;) store.get(k);</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">        if (list == null) {</span>
+<span class="fc" id="L316">            return null;</span>
+        }
+<span class="fc" id="L318">        return list.removeLast();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

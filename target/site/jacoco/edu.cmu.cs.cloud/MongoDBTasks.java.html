@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoDBTasks.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">MongoDBTasks.java</span></div><h1>MongoDBTasks.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+import java.util.Arrays;
+import java.util.List;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import java.io.IOException;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Sorts;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.model.Aggregates;
+
+import static com.mongodb.client.model.Filters.or;
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.regex;
+import static com.mongodb.client.model.Filters.gte;
+
+
+
+<span class="nc" id="L26">public class MongoDBTasks {</span>
+    /**
+     * The variable storing the mongodb connection string
+     */
+    private static String connectionString;
+    /**
+     * MongoClientURI object
+     */
+    private static MongoClientURI mongoClientURI;
+    /**
+     * MongoClient object
+     */
+    private static MongoClient mongoClient;
+    /**
+     * MongoDarabase object
+     */
+    private static MongoDatabase mongoDatabase;
+    /**
+     * MongoCollection Object
+     */
+    private static MongoCollection&lt;Document&gt; mongoCollection;
+    /**
+     * Logger.
+     */
+<span class="nc" id="L50">    private static final Logger LOGGER = Logger.getRootLogger();</span>
+
+    /**
+     * Initialize MongoDB connection.
+     *
+     * @throws IOException if a network exception occurs.
+     */
+    private static void initializeConnection() throws IOException {
+        // Turn of the logging to get rid of unnecessary standard output.
+<span class="nc" id="L59">        LOGGER.setLevel(Level.OFF);</span>
+<span class="nc" id="L60">        connectionString = System.getenv(&quot;CS&quot;);</span>
+
+        // Validate the connection string
+<span class="nc bnc" id="L63" title="All 4 branches missed.">        if (connectionString == null || connectionString.isEmpty()) {</span>
+<span class="nc" id="L64">            System.out.println(&quot;Connection string (CS) is not set in the environment variables.&quot;);</span>
+<span class="nc" id="L65">            return;</span>
+        }
+
+        // create a mongoURI out of the connection string
+<span class="nc" id="L69">        mongoClientURI = new MongoClientURI(connectionString);</span>
+
+        // use the URI object to create a mongoClient object
+<span class="nc" id="L72">        mongoClient = new MongoClient(mongoClientURI);</span>
+
+        // fetch the database
+<span class="nc" id="L75">        mongoDatabase = mongoClient.getDatabase(&quot;cosmos&quot;);</span>
+
+        // fetch the collection from the database
+<span class="nc" id="L78">        mongoCollection = mongoDatabase.getCollection(&quot;yelp&quot;);</span>
+<span class="nc" id="L79">    }</span>
+
+    /**
+     * Clean up resources.
+     *
+     * @throws IOException
+     * Throw IOEXception
+     */
+    private static void cleanup() throws IOException {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (mongoClient != null) {</span>
+<span class="nc" id="L89">            mongoClient.close();</span>
+        }
+<span class="nc" id="L91">    }</span>
+
+    /**
+     * You should complete the missing parts in the following method.
+     * Feel free to add helper functions if necessary.
+     *
+     * For all questions, output your answer in ONE single line,
+     * i.e. use System.out.print().
+     *
+     * @param args The arguments for main method.
+     * @throws IOException if a remote or network exception occurs.
+     */
+    public static void main(String[] args) throws Throwable {
+<span class="nc" id="L104">        initializeConnection();</span>
+<span class="nc bnc" id="L105" title="All 6 branches missed.">        switch (args[0]) {</span>
+            case &quot;demo&quot;:
+<span class="nc" id="L107">                demo();</span>
+<span class="nc" id="L108">                break;</span>
+            case &quot;q9&quot;:
+<span class="nc" id="L110">                q9();</span>
+<span class="nc" id="L111">                break;</span>
+            case &quot;q10&quot;:
+<span class="nc" id="L113">                q10();</span>
+<span class="nc" id="L114">                break;</span>
+            case &quot;q11&quot;:
+<span class="nc" id="L116">                q11();</span>
+<span class="nc" id="L117">                break;</span>
+            case &quot;q12&quot;:
+<span class="nc" id="L119">                q12();</span>
+<span class="nc" id="L120">                break;</span>
+            default:
+                break;
+        }
+<span class="nc" id="L124">        cleanup();</span>
+<span class="nc" id="L125">    }</span>
+
+    /**
+     * This is a demo of how to use MongoDB Java API.
+     * It will print the number of businesses in &quot;Pittsburgh&quot;.
+     *
+     * @throws IOException if a remote or network exception occurs.
+     */
+    private static void demo() throws IOException {
+<span class="nc" id="L134">        Bson query = regex(&quot;city&quot;, &quot;Pittsburgh&quot;);</span>
+
+<span class="nc" id="L136">        long count = mongoCollection.countDocuments(query);</span>
+
+<span class="nc" id="L138">        System.out.println(&quot;Scan finished. &quot; + count + &quot; match(es) found.&quot;);</span>
+<span class="nc" id="L139">    }</span>
+
+    /**
+     * Question 9.
+     *
+     * Scenario:
+     * What's that new &quot;Asian Fusion&quot; place in &quot;Shadyside&quot; with free wifi and
+     * bike parking?
+     *
+     * Print each name of the business on a single line.
+     * If there are multiple answers, print all of them.
+     *
+     * Hint:
+     * 1. The &quot;neighborhood&quot; column should contain &quot;Shadyside&quot; as a substring.
+     * 2. The &quot;categories&quot; column should contain &quot;Asian Fusion&quot; as a substring.
+     * 3. The &quot;WiFi&quot; and &quot;BikeParking&quot; information can be found in the
+     * &quot;attributes&quot; column. Please be careful about the format of the data.
+     *
+     * You are allowed to make changes such as modifying method name, parameter
+     * list and/or return type.
+     */
+    private static void q9() throws IOException {
+<span class="nc" id="L161">        Bson neighborhood = regex(&quot;neighborhood&quot;, &quot;Shadyside&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L162">        Bson categories = regex(&quot;categories&quot;, &quot;Asian Fusion&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L163">        Bson wifi = regex(&quot;attributes&quot;, &quot;'WiFi': 'free'&quot;);</span>
+<span class="nc" id="L164">        Bson bikeParking = regex(&quot;attributes&quot;, &quot;'BikeParking':\\s*true&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L165">        Bson query = and(neighborhood, categories, wifi, bikeParking);</span>
+
+<span class="nc" id="L167">        try (MongoCursor&lt;Document&gt; cursor = mongoCollection.find(query).iterator()) {</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (!cursor.hasNext()) {</span>
+<span class="nc" id="L169">            System.out.println(&quot;No matches found.&quot;);</span>
+        }
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        while (cursor.hasNext()) {</span>
+<span class="nc" id="L172">            Document doc = cursor.next();</span>
+<span class="nc" id="L173">            String name = doc.getString(&quot;name&quot;); // Assuming the name of the business is stored in the 'name' field</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (name != null) {</span>
+<span class="nc" id="L175">                System.out.println(name);</span>
+            }
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">        } catch (Exception e) {</span>
+<span class="nc" id="L179">            System.err.println(&quot;An error occurred: &quot; + e.getMessage());</span>
+<span class="nc" id="L180">            e.printStackTrace();</span>
+<span class="nc" id="L181">        }</span>
+<span class="nc" id="L182">    }</span>
+
+    /**
+     * Question 10.
+     *
+     * Scenario:
+     * I'm looking for some Indian food to eat in Downtown or Oakland of Pittsburgh
+     * that start serving on Fridays at 5pm, but still deliver in case I'm too lazy
+     * to drive there.
+     *
+     * Print each name of the business on a single line.
+     * If there are multiple answers, print all of them
+     * in ascending lexicographical order.
+     *
+     * Hint:
+     * 1. The &quot;name&quot; column should contain &quot;India&quot; as a substring.
+     * 2. The &quot;neighborhood&quot; column should contain &quot;Downtown&quot; or &quot;Oakland&quot;
+     * as a substring.
+     * 3. The &quot;city&quot; column should contain &quot;Pittsburgh&quot; as a substring.
+     * 4. The &quot;hours&quot; column shows the hours when businesses start serving.
+     * 5. The &quot;RestaurantsDelivery&quot; information can be found in the
+     * &quot;attributes&quot; column.
+     *
+     * Note:
+     * Only for this question, to guarrentee the ascending lexicographical
+     * order, you are allowed to sort the result of your query with Java code.
+     * No other further processing is allowed.
+     *
+     * You are allowed to make changes such as modifying method name, parameter
+     * list and/or return type.
+     */
+    private static void q10() throws IOException {
+<span class="nc" id="L214">        Bson nameFilter = regex(&quot;name&quot;, &quot;India&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L215">        Bson neighborhoodFilter = or(regex(&quot;neighborhood&quot;, &quot;Downtown&quot;, &quot;i&quot;), regex(&quot;neighborhood&quot;, &quot;Oakland&quot;, &quot;i&quot;));</span>
+<span class="nc" id="L216">        Bson cityFilter = eq(&quot;city&quot;, &quot;Pittsburgh&quot;);</span>
+<span class="nc" id="L217">        Bson hoursFilter = regex(&quot;hours&quot;, &quot;.*'Friday':\\s*'17:00-.*&quot;);</span>
+<span class="nc" id="L218">        Bson deliveryFilter = regex(&quot;attributes&quot;, &quot;'RestaurantsDelivery':\\s*true&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L219">        Bson query = and(nameFilter, neighborhoodFilter, cityFilter, hoursFilter, deliveryFilter);</span>
+
+<span class="nc" id="L221">        try (MongoCursor&lt;Document&gt; cursor = mongoCollection.find(query).sort(Sorts.ascending(&quot;name&quot;)).iterator()) {</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (!cursor.hasNext()) {</span>
+<span class="nc" id="L223">                System.out.println(&quot;No matches found.&quot;);</span>
+            }
+<span class="nc bnc" id="L225" title="All 2 branches missed.">            while (cursor.hasNext()) {</span>
+<span class="nc" id="L226">                Document doc = cursor.next();</span>
+<span class="nc" id="L227">                String name = doc.getString(&quot;name&quot;);</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                if (name != null) {</span>
+<span class="nc" id="L229">                    System.out.println(name);</span>
+                }
+<span class="nc" id="L231">            }</span>
+<span class="nc" id="L232">        } catch (Exception e) {</span>
+<span class="nc" id="L233">            System.err.println(&quot;An error occurred: &quot; + e.getMessage());</span>
+<span class="nc" id="L234">            e.printStackTrace();</span>
+<span class="nc" id="L235">        }</span>
+<span class="nc" id="L236">    }</span>
+
+    /**
+     * Question 11.
+     *
+     * Find the names and addresses of &quot;Dental&quot; businesses that accept insurance,
+     * are open for appointments only, and have a star rating of 4 or higher.
+     * These businesses should be within the city of &quot;Ahwatukee&quot;.
+     *
+     * Print each result on a single line with the format &quot;Name: &lt;name&gt;, Address: &lt;address&gt;&quot;
+     *
+     * You are allowed to make changes such as modifying method name, parameter
+     * list and/or return type.
+     */
+    private static void q11() throws IOException {
+<span class="nc" id="L251">        Bson categoryFilter = regex(&quot;categories&quot;, &quot;Dentists&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L252">        Bson insuranceFilter = regex(&quot;attributes&quot;, &quot;'AcceptsInsurance':\\s*True&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L253">        Bson appointmentsOnlyFilter = regex(&quot;attributes&quot;, &quot;'ByAppointmentOnly':\\s*True&quot;, &quot;i&quot;);</span>
+<span class="nc" id="L254">        Bson starRatingFilter = gte(&quot;stars&quot;, 4.0);</span>
+<span class="nc" id="L255">        Bson cityFilter = regex(&quot;city&quot;, &quot;Ahwatukee&quot;);</span>
+<span class="nc" id="L256">        Bson query = and(categoryFilter, insuranceFilter, appointmentsOnlyFilter, starRatingFilter,cityFilter);</span>
+<span class="nc" id="L257">        try (MongoCursor&lt;Document&gt; cursor = mongoCollection.find(query).iterator()) {</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            if (!cursor.hasNext()) {</span>
+<span class="nc" id="L259">                System.out.println(&quot;No matches found.&quot;);</span>
+            }
+<span class="nc bnc" id="L261" title="All 2 branches missed.">            while (cursor.hasNext()) {</span>
+<span class="nc" id="L262">                Document doc = cursor.next();</span>
+<span class="nc" id="L263">                String name = doc.getString(&quot;name&quot;);</span>
+<span class="nc" id="L264">                String address = doc.getString(&quot;address&quot;);</span>
+<span class="nc bnc" id="L265" title="All 4 branches missed.">                if (name != null &amp;&amp; address != null) {</span>
+<span class="nc" id="L266">                    System.out.println(&quot;Name: &quot; + name + &quot;, Address: &quot; + address);</span>
+                }
+<span class="nc" id="L268">            }</span>
+<span class="nc" id="L269">        } catch (Exception e) {</span>
+<span class="nc" id="L270">            System.err.println(&quot;An error occurred: &quot; + e.getMessage());</span>
+<span class="nc" id="L271">            e.printStackTrace();</span>
+<span class="nc" id="L272">        }</span>
+<span class="nc" id="L273">    }</span>
+
+    /**
+     * Question 12.
+     *
+     * Count the number of unique cities represented in the businesses collection.
+     *
+     * Print the number on a single line.
+     *
+     * Note: You are not allowed to scan the whole table and count the number of records.
+     *
+     * You are allowed to make changes such as modifying method name, parameter
+     * list and/or return type.
+     */
+    private static void q12() throws Throwable {
+<span class="nc" id="L288">        List&lt;Bson&gt; aggpipline = Arrays.asList(</span>
+<span class="nc" id="L289">            Aggregates.group(&quot;$city&quot;),</span>
+<span class="nc" id="L290">            Aggregates.count(&quot;uniqueCityCount&quot;)</span>
+        );
+
+<span class="nc" id="L293">        AggregateIterable&lt;Document&gt; result = mongoCollection.aggregate(aggpipline);</span>
+<span class="nc" id="L294">        Document doc = result.first();</span>
+
+<span class="nc bnc" id="L296" title="All 4 branches missed.">        if (doc != null &amp;&amp; doc.containsKey(&quot;uniqueCityCount&quot;)) {</span>
+<span class="nc" id="L297">            System.out.println(doc.getInteger(&quot;uniqueCityCount&quot;));</span>
+        } else {
+<span class="nc" id="L299">            System.out.println(&quot;0&quot;);</span>
+        }
+<span class="nc" id="L301">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

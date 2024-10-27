@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Business.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">Business.java</span></div><h1>Business.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+/**
+ * The domain class that is mapped to the &quot;businesses&quot; table.
+ *
+ * A domain class is used to map the data from the persistent storage (e.g. DB)
+ * to in-memory objects.
+ *
+ * The Lombok {@link Data} annotation will generate a set of methods, e.g.
+ * getters for all fields,
+ * setters for all non-final fields,
+ * toString() as well as a constructor.
+ *
+ * You only need to update this class by adding the fields that are missing.
+ * The Lombok {@link Data} annotation will create the new getters, setters, and
+ * update the implementation of {@link #toString()}.
+ *
+ * The object(s) will be serialized to JSON object(s) in {@link YelpApp}.
+ * The order of the fields does not matter.
+ */
+<span class="nc bnc" id="L28" title="All 110 branches missed.">@Data</span>
+@Entity
+@Table(name = &quot;businesses&quot;)
+public class Business {
+
+    /**
+     * `address` varchar(140) not null.
+     */
+    @Column
+<span class="nc" id="L37">    private String address;</span>
+    /**
+     * `business_id` varchar(22) not null.
+     * primary key (business_id)
+     */
+    @Column
+    @Id
+<span class="nc" id="L44">    private String business_id;</span>
+    /**
+     * `city` varchar(140) default null.
+     */
+    @Column
+<span class="nc" id="L49">    private String city;</span>
+    /**
+     * `hours` LONGTEXT default null.
+     */
+    @Column
+<span class="nc" id="L54">    private String hours;</span>
+    /**
+     * `latitude` varchar(12) not null.
+     */
+    @Column
+<span class="nc" id="L59">    private String latitude;</span>
+    /**
+     * `longitude` varchar(12) not null.
+     */
+    @Column
+<span class="nc" id="L64">    private String longitude;</span>
+    /**
+     * `name` varchar(140) not null.
+     */
+    @Column
+<span class="nc" id="L69">    private String name;</span>
+    /**
+     * `postal_code` varchar(10) not null.
+     */
+    @Column
+<span class="nc" id="L74">    private String postal_code;</span>
+    /**
+     * `review_count` int(10) default 0 not null.
+     */
+    @Column
+<span class="nc" id="L79">    private int review_count;</span>
+    /**
+     * `stars` float(2,1) default 0.0 not null.
+     */
+    @Column
+<span class="nc" id="L84">    private float stars;</span>
+    /**
+     * `state` varchar(2) default null.
+     */
+    @Column
+<span class="nc" id="L89">    private String state;</span>
+    /**
+     * `neighborhood` varchar(140) default null.
+     */
+    @Column
+<span class="nc" id="L94">    private String neighborhood;</span>
+    /**
+     * `open` tinyint(1) not null.
+     */
+    @Column
+<span class="nc" id="L99">    private boolean open;</span>
+    /**
+     * `attributes` LONGTEXT default null.
+     */
+    @Column
+<span class="nc" id="L104">    private String attributes;</span>
+    /**
+     * `categories` LONGTEXT default null.
+     */
+    @Column
+<span class="nc" id="L109">    private String categories;</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

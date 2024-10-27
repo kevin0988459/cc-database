@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>YelpApp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">YelpApp.java</span></div><h1>YelpApp.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+import org.hibernate.service.ServiceRegistry;
+
+/**
+ * To develop an application with Hibernate, two sets of configurations are
+ * needed.
+ * 1. the database connection configuration
+ * 2. the mapping between domain model classes and database tables
+ *
+ * Usage:
+ * mvn clean package &amp;&amp; java -cp target/database_tasks.jar edu.cmu.cs.cloud.YelpApp
+ *
+ * You are NOT allowed to edit this class, or your submission will be rejected.
+ */
+<span class="nc" id="L28">public class YelpApp {</span>
+
+    /**
+     * Logger.
+     */
+<span class="nc" id="L33">    private static final Logger LOGGER = Logger.getRootLogger();</span>
+
+    /**
+     * Username and password.
+     */
+<span class="nc" id="L38">    private static final String DB_USER = System.getProperty(&quot;user.name&quot;);</span>
+<span class="nc" id="L39">    private static final String DB_PWD = System.getenv(&quot;MYSQL_PWD&quot;);</span>
+
+    /**
+     * SessionFactory is an immutable thread-safe cache of compiled mappings for
+     * a database.
+     *
+     * @return SessionFactory
+     */
+    private static SessionFactory buildSessionFactory() {
+        try {
+<span class="nc" id="L49">            Configuration configuration = new Configuration();</span>
+            /*
+             * Read the database connection configuration from
+             * &quot;src/main/resources/hibernate.properties&quot;.
+             */
+<span class="nc" id="L54">            Properties props = new Properties();</span>
+<span class="nc" id="L55">            props.load(YelpApp.class.getResourceAsStream(</span>
+                    &quot;/hibernate.properties&quot;));
+
+<span class="nc" id="L58">            if (props.getOrDefault(&quot;hibernate.connection.driver_class&quot;, &quot;&quot;)</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                    .equals(&quot;com.mysql.jdbc.Driver&quot;)) {</span>
+<span class="nc" id="L60">                props.put(&quot;hibernate.connection.username&quot;, DB_USER);</span>
+<span class="nc" id="L61">                props.put(&quot;hibernate.connection.password&quot;, DB_PWD);</span>
+            }
+
+<span class="nc" id="L64">            configuration.setProperties(props);</span>
+            // set the mapping between domain model classes and database tables
+<span class="nc" id="L66">            configuration.addAnnotatedClass(Business.class);</span>
+
+<span class="nc" id="L68">            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()</span>
+<span class="nc" id="L69">                    .applySettings(configuration.getProperties()).build();</span>
+<span class="nc" id="L70">            return configuration.buildSessionFactory(serviceRegistry);</span>
+<span class="nc" id="L71">        } catch (Throwable ex) {</span>
+<span class="nc" id="L72">            throw new ExceptionInInitializerError(ex);</span>
+        }
+    }
+
+    /**
+     * Main entry.
+     *
+     * Get the Pittsburgh business with the most reviews in the database as
+     * an object of the {@link Business} class and print the string
+     * representation of the object using {@link Business#toString()}.
+     *
+     * You are NOT allowed to edit the main entry method.
+     *
+     * @param args The arguments for main method.
+     */
+    public static void main(final String[] args) {
+<span class="nc" id="L88">        LOGGER.setLevel(Level.OFF);</span>
+<span class="nc" id="L89">        Session session = null;</span>
+<span class="nc" id="L90">        SessionFactory sessionFactory = null;</span>
+        try {
+<span class="nc" id="L92">            sessionFactory = buildSessionFactory();</span>
+<span class="nc" id="L93">            session = sessionFactory.getCurrentSession();</span>
+<span class="nc" id="L94">            session.beginTransaction();</span>
+
+            /*
+             * Similar to the SQL query:
+             * SELECT * FROM Business WHERE city = 'Pittsburgh' ORDER BY review_count DESC LIMIT 1;
+             */
+<span class="nc" id="L100">            Query query = session.createQuery(</span>
+                    &quot;from Business where city = 'Pittsburgh' order by review_count desc&quot;);
+<span class="nc" id="L102">            query.setMaxResults(1);</span>
+
+<span class="nc" id="L104">            ObjectMapper objectMapper = new ObjectMapper();</span>
+            @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L106">            List&lt;Business&gt; businesses = query.list();</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            for (Business business : businesses) {</span>
+                try {
+                    // serialize the object into JSON and print
+<span class="nc" id="L110">                    System.out.println(objectMapper.writeValueAsString(business));</span>
+<span class="nc" id="L111">                } catch (IOException e) {</span>
+<span class="nc" id="L112">                    e.printStackTrace();</span>
+<span class="nc" id="L113">                }</span>
+<span class="nc" id="L114">            }</span>
+<span class="nc" id="L115">            session.getTransaction().commit();</span>
+<span class="nc" id="L116">            sessionFactory.close();</span>
+<span class="nc" id="L117">        } catch (Exception e) {</span>
+<span class="nc" id="L118">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L120" title="All 4 branches missed.">            if (session != null &amp;&amp; session.isOpen()) {</span>
+<span class="nc" id="L121">                session.close();</span>
+            }
+<span class="nc bnc" id="L123" title="All 4 branches missed.">            if (sessionFactory != null &amp;&amp; sessionFactory.isOpen()) {</span>
+<span class="nc" id="L124">                sessionFactory.close();</span>
+            }
+        }
+<span class="nc" id="L127">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisLock.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">RedisLock.java</span></div><h1>RedisLock.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.SetParams;
+
+
+/**
+ * A class that implements a distributed lock using Redis.
+ */
+public class RedisLock {
+    private Jedis jedis;
+
+    /**
+     * Constructs a RedisLock with the specified Jedis client.
+     *
+     * @param jedis The Jedis client to use for Redis operations.
+     */
+<span class="nc" id="L18">    public RedisLock(Jedis jedis) {</span>
+<span class="nc" id="L19">        this.jedis = jedis;</span>
+<span class="nc" id="L20">    }</span>
+
+    /**
+     * Attempts to acquire a lock with the given key and time-to-live (TTL).
+     *
+     * @param lockKey The key to use for the lock in Redis.
+     * @param ttl The time-to-live for the lock in seconds.
+     * @return true if the lock was successfully acquired, false otherwise.
+     */
+    public boolean acquireLock(String lockKey, Long ttl) {
+        // used to set any additional options for the redis command
+<span class="nc" id="L31">        SetParams setParams = new SetParams(); </span>
+        // TODO: complete this function
+<span class="nc" id="L33">        String result = jedis.set(&quot;&quot;, &quot;&quot;, setParams);</span>
+<span class="nc" id="L34">        throw new RuntimeException(&quot;To be implemented&quot;);</span>
+    }
+
+    /**
+     * Attempts to release a previously acquired lock.
+     * This function should return true only if the lock was
+     * acquired and was has been successfully released.
+     *
+     * @param lockKey The key of the lock to release.
+     * @return true if the lock was successfully released, false otherwise.
+     */
+    public boolean releaseLock(String lockKey) {
+        // TODO: complete this function
+<span class="nc" id="L47">        throw new RuntimeException(&quot;To be implemented&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

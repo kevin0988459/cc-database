@@ -1,0 +1,13 @@
+edu/cmu/cs/cloud/MySQLTasks.class
+edu/cmu/cs/cloud/Memcached.class
+edu/cmu/cs/cloud/ReservationApp.class
+edu/cmu/cs/sample/Course.class
+edu/cmu/cs/sample/Project.class
+edu/cmu/cs/cloud/Config.class
+edu/cmu/cs/cloud/RedisLock.class
+edu/cmu/cs/cloud/Business.class
+edu/cmu/cs/cloud/Redis.class
+edu/cmu/cs/cloud/Server.class
+edu/cmu/cs/sample/Main.class
+edu/cmu/cs/cloud/MongoDBTasks.class
+edu/cmu/cs/cloud/YelpApp.class

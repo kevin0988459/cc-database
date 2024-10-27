@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.sample</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.sample;
+
+import edu.cmu.cs.cloud.YelpApp;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+
+<span class="nc" id="L19">public class Main {</span>
+    /**
+     * Logger.
+     */
+<span class="nc" id="L23">    private static final Logger LOGGER = Logger.getRootLogger();</span>
+
+    /**
+     * JDBC driver of MySQL Connector/J.
+     */
+    private static final String JDBC_DRIVER = &quot;com.mysql.jdbc.Driver&quot;;
+    /**
+     * Database name.
+     */
+    private static final String DB_NAME = &quot;sample_db&quot;;
+    /**
+     * URL for local MySQL DB.
+     *
+     * SSL connection must be established by default if explicit option isn't
+     * set. For compliance with existing applications not using SSL the
+     * verifyServerCertificate property is set to 'false'. You need either to
+     * explicitly disable SSL by setting useSSL=false, or set useSSL=true and
+     * provide truststore for server certificate verification.
+     *
+     * Establishing SSL connection without server's identity verification is not
+     * recommended. However, we keep it simple and get rid of SSL.
+     */
+    private static final String URL = &quot;jdbc:mysql://localhost/&quot; + DB_NAME
+            + &quot;?useSSL=false&quot;;
+    /**
+     * Username and password.
+     */
+<span class="nc" id="L50">    private static final String DB_USER = System.getProperty(&quot;user.name&quot;);</span>
+    private static final String DB_PWD = &quot;dbroot&quot;;
+    /**
+     * The connection (session) with the database.
+     */
+    private static Connection conn;
+
+    /**
+     * This is an example of plain-sql and ORM solutions to insert data into database.
+     *
+     * @param args
+     * Arguments for main method
+     */
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (args.length &lt; 1) {</span>
+<span class="nc" id="L65">            showUsage();</span>
+<span class="nc" id="L66">            System.exit(1);</span>
+        }
+<span class="nc bnc" id="L68" title="All 3 branches missed.">        switch (args[0]) {</span>
+            case &quot;plainSQL&quot;:
+<span class="nc" id="L70">                plainSQL();</span>
+<span class="nc" id="L71">                break;</span>
+            case &quot;ORM&quot;:
+<span class="nc" id="L73">                hibernate();</span>
+<span class="nc" id="L74">                break;</span>
+            default:
+<span class="nc" id="L76">                showUsage();</span>
+<span class="nc" id="L77">                System.exit(1);</span>
+        }
+<span class="nc" id="L79">    }</span>
+
+    /**
+     * Show the usage guide for this program.
+     */
+    private static void showUsage() {
+<span class="nc" id="L85">        String jarPath = &quot;target/database_tasks.jar&quot;;</span>
+<span class="nc" id="L86">        String className = &quot;edu.cmu.cs.sample.Main&quot;;</span>
+<span class="nc" id="L87">        System.out.println(</span>
+<span class="nc" id="L88">                String.format(&quot;Usage: java -cp %s %s plainSQL&quot;,</span>
+                        jarPath, className));
+<span class="nc" id="L90">        System.out.println(</span>
+<span class="nc" id="L91">                String.format(&quot;Usage: java -cp %s %s ORM&quot;,</span>
+                        jarPath, className));
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * Initialize the database connection.
+     *
+     * @throws ClassNotFoundException if JDBC_DRIVER not found.
+     * @throws SQLException           with incorrect SQL execution.
+     */
+    private static void initializeConnection() throws ClassNotFoundException,
+            SQLException {
+<span class="nc" id="L103">        Class.forName(JDBC_DRIVER);</span>
+<span class="nc" id="L104">        conn = DriverManager.getConnection(URL, DB_USER, DB_PWD);</span>
+<span class="nc" id="L105">    }</span>
+
+    /**
+     * Plain-SQL solutions.
+     *
+     * INSERT INTO `course` (`course_id`, `name`) VALUES
+     * (&quot;f20-15319&quot;, &quot;Cloud Computing Course&quot;);
+     * INSERT INTO `project` (`project_id`, `name`, `course_id`) VALUES
+     * (&quot;1.1&quot;, &quot;Sequential Programming&quot;, &quot;f20-15319&quot;);
+     * INSERT INTO `project` (`project_id`, `name`, `course_id`) VALUES
+     * (&quot;1.2&quot;, &quot;Parallel Programming&quot;, &quot;f20-15319&quot;);
+     *
+     * @throws ClassNotFoundException if JDBC_DRIVER not found.
+     * @throws SQLException           with incorrect SQL execution.
+     */
+    private static void plainSQL() throws SQLException, ClassNotFoundException {
+<span class="nc" id="L121">        Course course = new Course(&quot;f20-15319&quot;, &quot;Cloud Computing Course&quot;);</span>
+<span class="nc" id="L122">        Project project1 = new Project(&quot;1.1&quot;, &quot;Sequential Programming&quot;);</span>
+<span class="nc" id="L123">        project1.setCourse(course);</span>
+<span class="nc" id="L124">        Project project2 = new Project(&quot;1.2&quot;, &quot;Parallel Programming&quot;);</span>
+<span class="nc" id="L125">        project2.setCourse(course);</span>
+
+<span class="nc" id="L127">        PreparedStatement insertCoursePstmt = null;</span>
+<span class="nc" id="L128">        PreparedStatement insertProjectPstmt = null;</span>
+        try {
+<span class="nc" id="L130">            initializeConnection();</span>
+
+            // map the `Course` class to the `course` table
+<span class="nc" id="L133">            insertCoursePstmt = conn.prepareStatement(&quot;INSERT INTO `course` (`courseId`, `name`) &quot;</span>
+                    + &quot;VALUES (?, ?);&quot;);
+
+            // map the fields of the `Course` class to the columns of the `course` table
+<span class="nc" id="L137">            insertCoursePstmt.setString(1, course.getCourseId());</span>
+<span class="nc" id="L138">            insertCoursePstmt.setString(2, course.getName());</span>
+
+            // map a `Course` object to one row of the `course` table
+<span class="nc" id="L141">            insertCoursePstmt.executeUpdate();</span>
+
+<span class="nc" id="L143">            insertProjectPstmt = conn.prepareStatement(&quot;INSERT INTO `project` &quot;</span>
+                    + &quot;(`projectId`, `name`, `courseId`) &quot;
+                    + &quot;VALUES (?, ?, ?);&quot;);
+<span class="nc bnc" id="L146" title="All 2 branches missed.">            for (Project project : new Project[]{project1, project2}) {</span>
+<span class="nc" id="L147">                insertProjectPstmt.setString(1, project.getProjectId());</span>
+<span class="nc" id="L148">                insertProjectPstmt.setString(2, project.getName());</span>
+                // Association mismatch:
+                // Object-oriented languages represent associations using object references
+                // where as an RDBMS represents an association as a foreign key.
+<span class="nc" id="L152">                Course foreignKeyCourse = project.getCourse();</span>
+<span class="nc" id="L153">                insertProjectPstmt.setString(3, foreignKeyCourse.getCourseId());</span>
+<span class="nc" id="L154">                insertProjectPstmt.executeUpdate();</span>
+            }
+
+<span class="nc" id="L157">            System.out.println(&quot;Insert by plain SQL successfully!&quot;);</span>
+<span class="nc" id="L158">        } catch (Exception e) {</span>
+<span class="nc" id="L159">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L161" title="All 2 branches missed.">            if (insertCoursePstmt != null) {</span>
+                try {
+<span class="nc" id="L163">                    insertCoursePstmt.close();</span>
+<span class="nc" id="L164">                } catch (SQLException e) {</span>
+<span class="nc" id="L165">                    e.printStackTrace();</span>
+<span class="nc" id="L166">                }</span>
+            }
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (insertProjectPstmt != null) {</span>
+                try {
+<span class="nc" id="L170">                    insertProjectPstmt.close();</span>
+<span class="nc" id="L171">                } catch (SQLException e) {</span>
+<span class="nc" id="L172">                    e.printStackTrace();</span>
+<span class="nc" id="L173">                }</span>
+            }
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            if (conn != null) {</span>
+<span class="nc" id="L176">                conn.close();</span>
+            }
+        }
+
+
+<span class="nc" id="L181">    }</span>
+
+    /**
+     * ORM can abstract plain-SQL queries away from your application.
+     *
+     * INSERT INTO `course` (`course_id`, `name`) VALUES
+     * (&quot;f20-15619&quot;, &quot;Cloud Computing Course (Graduate)&quot;);
+     * INSERT INTO `project` (`project_id`, `name`, `course_id`) VALUES
+     * (&quot;phase1&quot;, &quot;Twitter Analytics Web Service Phase 1&quot;, &quot;f20-15619&quot;);
+     * INSERT INTO `project` (`project_id`, `name`, `course_id`) VALUES
+     * (&quot;phase2&quot;, &quot;Twitter Analytics Web Service Phase 2&quot;, &quot;f20-15619&quot;);
+     *
+     * @throws ClassNotFoundException if JDBC_DRIVER not found.
+     * @throws SQLException           with incorrect SQL execution.
+     */
+    private static void hibernate() {
+<span class="nc" id="L197">        LOGGER.setLevel(Level.OFF);</span>
+
+<span class="nc" id="L199">        Course course = new Course(&quot;f20-15619&quot;, &quot;Cloud Computing Course (Graduate)&quot;);</span>
+<span class="nc" id="L200">        Project project1 = new Project(&quot;phase1&quot;, &quot;Twitter Analytics Web Service Phase 1&quot;);</span>
+<span class="nc" id="L201">        project1.setCourse(course);</span>
+<span class="nc" id="L202">        Project project2 = new Project(&quot;phase2&quot;, &quot;Twitter Analytics Web Service Phase 2&quot;);</span>
+<span class="nc" id="L203">        project2.setCourse(course);</span>
+
+<span class="nc" id="L205">        Session session = null;</span>
+<span class="nc" id="L206">        SessionFactory sessionFactory = null;</span>
+        try {
+<span class="nc" id="L208">            sessionFactory = buildSessionFactory();</span>
+<span class="nc" id="L209">            session = sessionFactory.getCurrentSession();</span>
+<span class="nc" id="L210">            session.beginTransaction();</span>
+<span class="nc" id="L211">            session.save(course);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">            for (Project project : new Project[]{project1, project2}) {</span>
+<span class="nc" id="L213">                session.save(project);</span>
+            }
+<span class="nc" id="L215">            session.getTransaction().commit();</span>
+
+<span class="nc" id="L217">            System.out.println(&quot;Insert by hibernate successfully!&quot;);</span>
+<span class="nc" id="L218">        } catch (Exception e) {</span>
+<span class="nc" id="L219">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L221" title="All 4 branches missed.">            if (session != null &amp;&amp; session.isOpen()) {</span>
+<span class="nc" id="L222">                session.close();</span>
+            }
+<span class="nc bnc" id="L224" title="All 4 branches missed.">            if (sessionFactory != null &amp;&amp; sessionFactory.isOpen()) {</span>
+<span class="nc" id="L225">                sessionFactory.close();</span>
+            }
+        }
+<span class="nc" id="L228">    }</span>
+
+    /**
+     * SessionFactory is an immutable thread-safe cache of compiled mappings for
+     * a database.
+     *
+     * @return SessionFactory
+     */
+    private static SessionFactory buildSessionFactory() {
+        try {
+            /*
+             * Read the database connection configuration from
+             * &quot;src/main/resources/hibernate.properties&quot;.
+             */
+<span class="nc" id="L242">            Properties props = new Properties();</span>
+<span class="nc" id="L243">            props.load(YelpApp.class.getResourceAsStream(</span>
+                    &quot;/hibernate.properties&quot;));
+<span class="nc" id="L245">            props.put(&quot;hibernate.connection.driver_class&quot;, &quot;com.mysql.jdbc.Driver&quot;);</span>
+<span class="nc" id="L246">            props.put(&quot;hibernate.connection.url&quot;, URL);</span>
+<span class="nc" id="L247">            props.put(&quot;hibernate.connection.username&quot;, DB_USER);</span>
+<span class="nc" id="L248">            props.put(&quot;hibernate.connection.password&quot;, DB_PWD);</span>
+
+<span class="nc" id="L250">            Configuration configuration = new Configuration();</span>
+<span class="nc" id="L251">            configuration.setProperties(props);</span>
+            // set the mapping between domain model classes and database tables
+<span class="nc" id="L253">            configuration.addAnnotatedClass(Course.class);</span>
+<span class="nc" id="L254">            configuration.addAnnotatedClass(Project.class);</span>
+
+<span class="nc" id="L256">            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()</span>
+<span class="nc" id="L257">                    .applySettings(configuration.getProperties()).build();</span>
+<span class="nc" id="L258">            return configuration.buildSessionFactory(serviceRegistry);</span>
+<span class="nc" id="L259">        } catch (Throwable ex) {</span>
+<span class="nc" id="L260">            throw new ExceptionInInitializerError(ex);</span>
+        }
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>

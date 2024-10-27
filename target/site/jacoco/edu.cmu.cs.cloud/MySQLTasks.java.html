@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MySQLTasks.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pdatabase</a> &gt; <a href="index.source.html" class="el_package">edu.cmu.cs.cloud</a> &gt; <span class="el_source">MySQLTasks.java</span></div><h1>MySQLTasks.java</h1><pre class="source lang-java linenums">package edu.cmu.cs.cloud;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+<span class="nc" id="L13">public class MySQLTasks {</span>
+
+    /**
+     * JDBC driver of MySQL Connector/J.
+     */
+    private static final String JDBC_DRIVER = &quot;com.mysql.jdbc.Driver&quot;;
+    /**
+     * Database name.
+     */
+    private static final String DB_NAME = &quot;yelp_db&quot;;
+    /**
+     * URL for local MySQL DB.
+     *
+     * SSL connection must be established by default if explicit option isn't
+     * set. For compliance with existing applications not using SSL the
+     * verifyServerCertificate property is set to 'false'. You need either to
+     * explicitly disable SSL by setting useSSL=false, or set useSSL=true and
+     * provide truststore for server certificate verification.
+     *
+     * Establishing SSL connection without server's identity verification is not
+     * recommended. However, we keep it simple and get rid of SSL.
+     */
+    private static final String URL = &quot;jdbc:mysql://localhost/&quot; + DB_NAME
+            + &quot;?useSSL=false&quot;;
+    /**
+     * Username and password.
+     */
+<span class="nc" id="L40">    private static final String DB_USER = System.getProperty(&quot;user.name&quot;);</span>
+<span class="nc" id="L41">    private static final String DB_PWD = System.getenv(&quot;MYSQL_PWD&quot;);</span>
+    /**
+     * The connection (session) with the database.
+     */
+    private static Connection conn;
+
+    /**
+     * Main entry.
+     *
+     * You are NOT allowed to edit the main entry method.
+     *
+     * @param args The arguments for main method.
+     */
+    public static void main(final String[] args) {
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (args.length != 1) {</span>
+<span class="nc" id="L56">            showUsage();</span>
+<span class="nc" id="L57">            System.exit(1);</span>
+        }
+        try {
+<span class="nc" id="L60">            initializeConnection();</span>
+<span class="nc bnc" id="L61" title="All 9 branches missed.">            switch (args[0]) {</span>
+                case &quot;demo&quot;:
+<span class="nc" id="L63">                    demo();</span>
+<span class="nc" id="L64">                    break;</span>
+                case &quot;q2&quot;:
+<span class="nc" id="L66">                    q2();</span>
+<span class="nc" id="L67">                    break;</span>
+                case &quot;q3&quot;:
+<span class="nc" id="L69">                    q3();</span>
+<span class="nc" id="L70">                    break;</span>
+                case &quot;q4&quot;:
+<span class="nc" id="L72">                    q4();</span>
+<span class="nc" id="L73">                    break;</span>
+                case &quot;q5&quot;:
+<span class="nc" id="L75">                    q5();</span>
+<span class="nc" id="L76">                    break;</span>
+                case &quot;q6&quot;:
+<span class="nc" id="L78">                    q6();</span>
+<span class="nc" id="L79">                    break;</span>
+                case &quot;q7&quot;:
+<span class="nc" id="L81">                    q7();</span>
+<span class="nc" id="L82">                    break;</span>
+                case &quot;q8&quot;:
+<span class="nc" id="L84">                    YelpApp.main(new String[]{});</span>
+<span class="nc" id="L85">                    break;</span>
+                default:
+<span class="nc" id="L87">                    showUsage();</span>
+<span class="nc" id="L88">                    System.exit(1);</span>
+            }
+<span class="nc" id="L90">        } catch (Exception e) {</span>
+<span class="nc" id="L91">            System.out.println(e.getMessage());</span>
+        } finally {
+<span class="nc" id="L93">            cleanup();</span>
+        }
+<span class="nc" id="L95">    }</span>
+
+    /**
+     * Initialize the database connection.
+     *
+     * @throws ClassNotFoundException if JDBC_DRIVER not found.
+     * @throws SQLException           with incorrect SQL execution.
+     */
+    private static void initializeConnection() throws ClassNotFoundException,
+            SQLException {
+<span class="nc" id="L105">        Class.forName(JDBC_DRIVER);</span>
+<span class="nc" id="L106">        conn = DriverManager.getConnection(URL, DB_USER, DB_PWD);</span>
+<span class="nc" id="L107">    }</span>
+
+    /**
+     * Clean up and terminate the connection.
+     */
+    private static void cleanup() {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (conn != null) {</span>
+            try {
+<span class="nc" id="L115">                conn.close();</span>
+<span class="nc" id="L116">            } catch (SQLException e) {</span>
+<span class="nc" id="L117">                e.printStackTrace();</span>
+<span class="nc" id="L118">            }</span>
+        }
+<span class="nc" id="L120">    }</span>
+
+    /**
+     * JDBC usage demo. The following function will print the row count of the
+     * &quot;businesses&quot; table.
+     * Table must exists before this function is called.
+     */
+    private static void demo() {
+<span class="nc" id="L128">        String sql = &quot;SELECT count(*) AS cnt FROM businesses&quot;;</span>
+<span class="nc" id="L129">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L130">    }</span>
+
+    /**
+     * Question 2.
+     *
+     * Fill in a SQL query that prints the user id who posted the review that
+     * received the most &quot;cool&quot;.
+     * If there are multiple answers, print all of them.
+     * Do NOT hardcode your answer.
+     *
+     * Besides the result of the query,
+     * {@link MySQLTasks#printScannedRows(String)} will use the EXPLAIN
+     * statement to show the predicted scanned rows as the prediction of the
+     * performance. The template will do this for you and you only need to
+     * focus on the sql query.
+     *
+     * You are only allowed to edit the sql.
+     *
+     * The generated output by executing q2 will be:
+     * &lt;pre&gt;
+     * result
+     * number_of_scanned_rows
+     * &lt;/pre&gt;
+     */
+    private static void q2() {
+<span class="nc" id="L155">        dropCustomIndexesOnReviews();</span>
+<span class="nc" id="L156">        String sql = &quot;SELECT user_id FROM reviews WHERE cool = (SELECT MAX(cool) FROM reviews)&quot;;</span>
+<span class="nc" id="L157">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L158">        printScannedRows(sql);</span>
+<span class="nc" id="L159">    }</span>
+
+    /**
+     * Question 3.
+     *
+     * A database index is a data structure that improves the speed of data
+     * retrieval.
+     * Identify the column in the reviews table that will improve the
+     * performance of the query in question 2, and create a single-column
+     * index.
+     *
+     * A custom index name is needed.
+     * The index should be a single-column index instead of a composite index.
+     */
+    private static void q3() {
+<span class="nc" id="L174">        String sql = &quot;CREATE INDEX cool_i on reviews (cool) &quot;;</span>
+<span class="nc" id="L175">        executeDataDefinitionQuery(sql);</span>
+<span class="nc" id="L176">        printIndexColumnNames(&quot;reviews&quot;);</span>
+<span class="nc" id="L177">    }</span>
+
+    /**
+     * This method is used in {@link MySQLTasks#q2()}.
+     *
+     * KEY and INDEX are synonyms in MySQL.
+     * MySQL will build indexes on the primary keys and foreign keys.
+     *
+     * In the `reviews` table, `create_yelp_database.sql` will create 3
+     * indexes:
+     * primary key (review_id)
+     * foreign key (business_id)
+     * foreign key (user_id)
+     *
+     * This method will drop any other custom index created by you to reset
+     * the state of the `reviews` table.
+     */
+    private static void dropCustomIndexesOnReviews() {
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        for (String indexName : getIndexNames(&quot;reviews&quot;)) {</span>
+<span class="nc" id="L196">            executeDataDefinitionQuery(String.format(&quot;DROP INDEX %s ON reviews&quot;, indexName));</span>
+<span class="nc" id="L197">        }</span>
+<span class="nc" id="L198">    }</span>
+
+    /**
+     * Question 4.
+     *
+     * Fill in a SQL query that prints the user id who posted the review that
+     * received the most &quot;cool&quot;.
+     * If there are multiple answers, print all of them.
+     * Do NOT hardcode your answer.
+     *
+     * Besides the result of the query,
+     * {@link MySQLTasks#printScannedRows(String)} will use the EXPLAIN
+     * statement to show the predicted scanned rows as the prediction of the
+     * performance. The template will do this for you and you only need to
+     * focus on the sql query.
+     *
+     * If you have created a proper index in q3, the number of scanned rows
+     * will be much smaller than the prediction in q2.
+     *
+     * You are only allowed to edit the sql.
+     *
+     * The generated output by executing q4 will be:
+     * &lt;pre&gt;
+     * result
+     * number_of_scanned_rows
+     * &lt;/pre&gt;
+     */
+    private static void q4() {
+<span class="nc" id="L226">        String sql = &quot;SELECT user_id FROM reviews WHERE cool = (SELECT MAX(cool) FROM reviews)&quot;;</span>
+<span class="nc" id="L227">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L228">        printScannedRows(sql);</span>
+<span class="nc" id="L229">    }</span>
+
+    /**
+     * Question 5.
+     *
+     * Which South Side business has &quot;Coast&quot; in its name and has not been
+     * checked-in to yet?
+     * The output should be the name of the business.
+     *
+     * Note:
+     * The `neighborhood` should be &quot;South Side&quot;.
+     * The `name` of the business should contain &quot;Coast&quot; as a substring (case
+     * sensitive).
+     * Use `business_id` as the unique identifier of the business to
+     * filter businesses without checkins.
+     *
+     * If there are multiple answers, print all of them. Do NOT hardcode your
+     * answer.
+     *
+     * You are only allowed to edit the sql.
+     */
+    private static void q5() {
+<span class="nc" id="L251">        String sql = &quot;SELECT name FROM businesses &quot; +</span>
+                     &quot;WHERE neighborhood = 'South Side' AND name LIKE BINARY '%Coast%' &quot; +
+                     &quot;AND business_id NOT IN (SELECT business_id FROM checkins)&quot;;
+<span class="nc" id="L254">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L255">    }</span>
+
+    /**
+     * Question 6.
+     *
+     * Among the users with at least one tip, find who posted the coolest review
+     * The output should be the id of the user.
+     * Note:
+     * There is a `cool` column in the review table.
+     * If there are multiple answers, print all of them. Do NOT hardcode your
+     * answer.
+     *
+     * You are only allowed to edit the sql.
+     */
+    private static void q6() {
+<span class="nc" id="L270">        String sql = &quot;SELECT user_id FROM reviews &quot; +</span>
+                     &quot;WHERE user_id IN (SELECT user_id FROM tips) &quot; +
+                     &quot;AND cool = (SELECT MAX(cool) FROM reviews WHERE user_id IN (SELECT user_id FROM tips))&quot;;
+<span class="nc" id="L273">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L274">    }</span>
+
+    /**
+     * Question 7.
+     *
+     * Find the top 3 cities with the highest average business rating(stars).
+     * Break ties by the name of city (in ascending lexicographical order).
+     *
+     * You are only allowed to edit the sql.
+     */
+    private static void q7() {
+<span class="nc" id="L285">        String sql = &quot;SELECT city FROM businesses &quot; +</span>
+                     &quot;GROUP BY city &quot; +
+                     &quot;ORDER BY AVG(stars) DESC, city ASC &quot; +
+                     &quot;LIMIT 3&quot;;
+<span class="nc" id="L289">        executeDataManipulationQuery(sql);</span>
+<span class="nc" id="L290">    }</span>
+
+    /*
+     * The methods below are the helper methods.
+     * You are NOT allowed to edit any help method, but feel free to read and
+     * learn from them.
+     */
+
+    /**
+     * Show the usage guide for this program.
+     */
+    private static void showUsage() {
+<span class="nc" id="L302">        String jarPath = &quot;target/database_tasks.jar&quot;;</span>
+<span class="nc" id="L303">        String className = &quot;edu.cmu.cs.cloud.MySQLTasks&quot;;</span>
+<span class="nc" id="L304">        System.out.println(</span>
+<span class="nc" id="L305">                String.format(&quot;Usage: java -cp %s %s &lt;question&gt;&quot;,</span>
+                        jarPath, className));
+<span class="nc" id="L307">        System.out.println(</span>
+<span class="nc" id="L308">                String.format(&quot;Usage: java -cp %s %s demo&quot;,</span>
+                        jarPath, className));
+<span class="nc" id="L310">    }</span>
+
+    /**
+     * Get the total number of scanned rows on a query as the EXPLAIN
+     * statement predicts.
+     *
+     * If the value is SQL NULL in the &quot;rows&quot; column,
+     * {@link ResultSet#getString(String)} will return null.
+     *
+     * @param sql to predict the rows to scan.
+     */
+    private static void printScannedRows(final String sql) {
+<span class="nc" id="L322">        String query = &quot;EXPLAIN &quot; + sql;</span>
+<span class="nc" id="L323">        Statement stmt = null;</span>
+<span class="nc" id="L324">        int rows = 0;</span>
+        try {
+<span class="nc" id="L326">            stmt = conn.createStatement();</span>
+<span class="nc" id="L327">            ResultSet rs = stmt.executeQuery(query);</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L329">                String count = rs.getString(&quot;rows&quot;);</span>
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                rows += count == null ? 0 : Integer.valueOf(count);</span>
+<span class="nc" id="L331">            }</span>
+<span class="nc" id="L332">        } catch (SQLException e) {</span>
+<span class="nc" id="L333">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L335" title="All 2 branches missed.">            if (stmt != null) {</span>
+                try {
+<span class="nc" id="L337">                    stmt.close();</span>
+<span class="nc" id="L338">                } catch (SQLException e) {</span>
+<span class="nc" id="L339">                    e.printStackTrace();</span>
+<span class="nc" id="L340">                }</span>
+            }
+        }
+<span class="nc" id="L343">        System.out.println(rows);</span>
+<span class="nc" id="L344">    }</span>
+
+    /**
+     * Print the column name of the custom index(es) given the table name.
+     *
+     * The primary key and foreign key (on business_id) created by
+     * create_yelp_database.sql will be excluded.
+     */
+    private static void printIndexColumnNames(String tableName) {
+<span class="nc bnc" id="L353" title="All 2 branches missed.">        for (String columnName : getIndexColumnNames(tableName)) {</span>
+<span class="nc" id="L354">            System.out.println(columnName);</span>
+<span class="nc" id="L355">        }</span>
+<span class="nc" id="L356">    }</span>
+
+    /**
+     * Get the column name of the custom index(es) given the table name.
+     *
+     * The primary key and foreign key (on business_id) created by
+     * create_yelp_database.sql will be excluded.
+     */
+    private static List&lt;String&gt; getIndexNames(String tableName) {
+<span class="nc" id="L365">        return new LinkedList&lt;&gt;(getIndexes(tableName).keySet());</span>
+    }
+
+    /**
+     * Get the index name of the custom index(es) given the table name.
+     *
+     * The primary key and foreign key (on business_id) created by
+     * create_yelp_database.sql will be excluded.
+     */
+    private static List&lt;String&gt; getIndexColumnNames(String tableName) {
+<span class="nc" id="L375">        return new LinkedList&lt;&gt;(getIndexes(tableName).values());</span>
+    }
+
+    /**
+     * Get the custom index(es) given the table name.
+     *
+     * The primary key and foreign key (on business_id) created by
+     * create_yelp_database.sql will be excluded.
+     *
+     * @return indexes with K: INDEX_NAME, V: COLUMN_NAME
+     */
+    private static Map&lt;String, String&gt; getIndexes(String tableName) {
+<span class="nc" id="L387">        String query =</span>
+<span class="nc" id="L388">                String.format(&quot;SELECT INDEX_NAME, COLUMN_NAME FROM &quot;</span>
+                        + &quot;INFORMATION_SCHEMA.STATISTICS &quot;
+                        + &quot;WHERE table_schema = '%s' AND table_name = &quot;
+                        + &quot;'%s'&quot;, DB_NAME, tableName);
+<span class="nc" id="L392">        Statement stmt = null;</span>
+<span class="nc" id="L393">        Map&lt;String, String&gt; indexes = new HashMap&lt;&gt;();</span>
+        try {
+<span class="nc" id="L395">            stmt = conn.createStatement();</span>
+<span class="nc" id="L396">            ResultSet rs = stmt.executeQuery(query);</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L398">                String indexName = rs.getString(&quot;INDEX_NAME&quot;);</span>
+<span class="nc" id="L399">                String columnName = rs.getString(&quot;COLUMN_NAME&quot;);</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">                if (!indexName.equals(&quot;PRIMARY&quot;)</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">                        &amp;&amp; !indexName.equals(&quot;user_id&quot;)</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">                        &amp;&amp; !indexName.equals(&quot;business_id&quot;)) {</span>
+<span class="nc" id="L403">                    indexes.put(indexName, columnName);</span>
+                }
+<span class="nc" id="L405">            }</span>
+<span class="nc" id="L406">        } catch (SQLException e) {</span>
+<span class="nc" id="L407">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L409" title="All 2 branches missed.">            if (stmt != null) {</span>
+                try {
+<span class="nc" id="L411">                    stmt.close();</span>
+<span class="nc" id="L412">                } catch (SQLException e) {</span>
+<span class="nc" id="L413">                    e.printStackTrace();</span>
+<span class="nc" id="L414">                }</span>
+            }
+        }
+<span class="nc" id="L417">        return indexes;</span>
+    }
+
+    /**
+     * Execute a SQL Query with DML, iterate the {@link ResultSet} and print
+     * the values in the first column.
+     *
+     * DML is abbreviation of Data Manipulation Language, which is used to
+     * retrieve, store, modify, delete, insert and update data in database.
+     * e.g.
+     * {@code SELECT, UPDATE, INSERT}
+     *
+     * We expect a single query for each question, not more.
+     * Nested query is allowed, but not multiple queries.
+     * Retrieves the value of the first column in all the rows.
+     *
+     * You are not allowed to edit this method.
+     *
+     * @param sql the sql command to execute
+     */
+    private static void executeDataManipulationQuery(final String sql) {
+        // retain the first query
+<span class="nc" id="L439">        String query = sql.split(&quot;;&quot;)[0];</span>
+<span class="nc" id="L440">        Statement stmt = null;</span>
+        try {
+<span class="nc" id="L442">            stmt = conn.createStatement();</span>
+<span class="nc" id="L443">            ResultSet rs = stmt.executeQuery(query);</span>
+<span class="nc bnc" id="L444" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L445">                System.out.println(rs.getString(1));</span>
+            }
+<span class="nc" id="L447">        } catch (SQLException e) {</span>
+<span class="nc" id="L448">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L450" title="All 2 branches missed.">            if (stmt != null) {</span>
+                try {
+<span class="nc" id="L452">                    stmt.close();</span>
+<span class="nc" id="L453">                } catch (SQLException e) {</span>
+<span class="nc" id="L454">                    e.printStackTrace();</span>
+<span class="nc" id="L455">                }</span>
+            }
+        }
+<span class="nc" id="L458">    }</span>
+
+    /**
+     * Execute a SQL Query with DDL.
+     *
+     * DDL is abbreviation of Data Definition Language, which is used to
+     * create and modify the structure of database objects in database.
+     * e.g.
+     * {@code CREATE, ALTER, DROP}
+     *
+     * We expect a single query for each question, not more.
+     * Nested query is allowed, but not multiple queries.
+     * Retrieves the value of the first column in all the rows.
+     *
+     * You are not allowed to edit this method.
+     *
+     * @param sql the sql command to execute
+     */
+    private static void executeDataDefinitionQuery(final String sql) {
+        // retain the first query
+<span class="nc" id="L478">        String query = sql.split(&quot;;&quot;)[0];</span>
+<span class="nc" id="L479">        Statement stmt = null;</span>
+        try {
+<span class="nc" id="L481">            stmt = conn.createStatement();</span>
+<span class="nc" id="L482">            int rs = stmt.executeUpdate(query);</span>
+<span class="nc" id="L483">        } catch (SQLException e) {</span>
+<span class="nc" id="L484">            e.printStackTrace();</span>
+        } finally {
+<span class="nc bnc" id="L486" title="All 2 branches missed.">            if (stmt != null) {</span>
+                try {
+<span class="nc" id="L488">                    stmt.close();</span>
+<span class="nc" id="L489">                } catch (SQLException e) {</span>
+<span class="nc" id="L490">                    e.printStackTrace();</span>
+<span class="nc" id="L491">                }</span>
+            }
+        }
+<span class="nc" id="L494">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
