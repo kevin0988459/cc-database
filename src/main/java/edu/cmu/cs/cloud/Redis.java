@@ -199,8 +199,10 @@ public class Redis {
             m = new HashMap<>();
             store.put(k, m);
         }
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        int initialSize = m.size();
+        m.put(f, v);
+        int finalSize = m.size();
+        return finalSize > initialSize ? 1 : 0;
     }
 
     /**
@@ -219,8 +221,7 @@ public class Redis {
         if (m == null) {
             return null;
         }
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        return m.get(f);
     }
 
     /**
@@ -242,8 +243,11 @@ public class Redis {
         if (m == null) {
             return list;
         }
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        for (HashMap.Entry<String, String> entry: m.entrySet()) {
+            list.add(entry.getKey());
+            list.add(entry.getValue());
+        }
+        return list;
     }
 
     /**
@@ -288,8 +292,10 @@ public class Redis {
             list = new LinkedList<>();
             store.put(k, list);
         }
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        for (String v: vs) {
+            list.addLast(v);
+        }
+        return list.size();
     }
 
     /**
@@ -309,7 +315,6 @@ public class Redis {
         if (list == null) {
             return null;
         }
-        throw new UnsupportedOperationException(
-                "Waiting to be implemented");
+        return list.removeLast();
     }
 }

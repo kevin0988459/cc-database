@@ -103,31 +103,98 @@ class RedisTest {
 
     @Test
     void hset() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        assertEquals(1, redisClient.hset("hash1", "field1", "value1"));
+        assertEquals(0, redisClient.hset("hash1", "field1", "value2"));
+        assertEquals(1, redisClient.hset("hash1", "field2", "value3"));
+        assertEquals(1, redisClient.hset("hash2", "field1", "value1"));
     }
 
     @Test
     void hget() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        assertNull(redisClient.hget("nonExistingHash", "field1"));
+
+        redisClient.hset("hash1", "field1", "value1");
+        redisClient.hset("hash1", "field2", "value2");
+
+        assertEquals("value1", redisClient.hget("hash1", "field1"));
+        assertEquals("value2", redisClient.hget("hash1", "field2"));
+
+        assertNull(redisClient.hget("hash1", "field3"));
     }
 
     @Test
     void hgetall() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        List<String> result = redisClient.hgetall("nonExistingHash");
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        redisClient.hset("hash1", "field1", "value1");
+        redisClient.hset("hash1", "field2", "value2");
+
+        result = redisClient.hgetall("hash1");
+        assertEquals(4, result.size()); 
+        assertTrue(result.contains("field1"));
+        assertTrue(result.contains("value1"));
+        assertTrue(result.contains("field2"));
+        assertTrue(result.contains("value2"));
     }
 
     @Test
     void llen() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        assertEquals(0, redisClient.llen("nonExistingList"));
+
+        redisClient.rpush("list1");
+        assertEquals(0, redisClient.llen("list1"));
+
+        redisClient.rpush("list1", "value1");
+        assertEquals(1, redisClient.llen("list1"));
+
+        redisClient.rpush("list1", "value2", "value3");
+        assertEquals(3, redisClient.llen("list1"));
+
+        redisClient.set("stringKey", "someValue");
     }
 
     @Test
     void rpush() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        assertEquals(2, redisClient.rpush("list1", "value1", "value2"));
+
+        assertEquals(4, redisClient.rpush("list1", "value3", "value4"));
+
+        assertEquals(4, redisClient.rpush("list1"));
+
+        assertEquals(6, redisClient.rpush("list1", "value5", "value6"));
     }
 
     @Test
     void rpop() {
-        throw new RuntimeException("add test cases on your own");
+        Redis redisClient = new Redis();
+
+        assertNull(redisClient.rpop("nonExistingList"));
+
+        redisClient.rpush("list1");
+        assertNull(redisClient.rpop("list1"));
+
+        redisClient.rpush("list1", "value1", "value2", "value3");
+        assertEquals("value3", redisClient.rpop("list1"));
+        assertEquals(2, redisClient.llen("list1"));
+
+        assertEquals("value2", redisClient.rpop("list1"));
+        assertEquals(1, redisClient.llen("list1"));
+
+        assertEquals("value1", redisClient.rpop("list1"));
+        assertEquals(0, redisClient.llen("list1"));
+
+        assertNull(redisClient.rpop("list1"));
     }
 }
