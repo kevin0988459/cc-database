@@ -30,8 +30,7 @@ public class RedisLock {
         // used to set any additional options for the redis command
         SetParams setParams = new SetParams(); 
         setParams.nx().px(ttl);
-        String uuid = java.util.UUID.randomUUID().toString();
-        String result = jedis.set(lockKey, uuid, setParams);
+        String result = jedis.set(lockKey, "locked", setParams);
         if ("OK".equals(result)) {
             return true;
         }
