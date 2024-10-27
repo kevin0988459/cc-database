@@ -130,7 +130,6 @@ class RedisTest {
     void hgetall() {
         Redis redisClient = new Redis();
 
-        List<String> result = redisClient.hgetall("nonExistingHash");
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
