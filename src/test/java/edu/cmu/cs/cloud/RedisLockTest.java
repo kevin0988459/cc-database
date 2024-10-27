@@ -113,7 +113,7 @@ class RedisLockTest {
     }
 
     @Test
-    void lockExpiration() {
+    void lockExpiration() throws InterruptedException {
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
         assertTrue(redisLock.acquireLock("lockKey", 1000L));
@@ -134,7 +134,7 @@ class RedisLockTest {
     }
 
     @Test
-    void releaseAfterTimeout() {
+    void releaseAfterTimeout() throws InterruptedException{
         Jedis jedis = jedisPool.getResource();
         RedisLock redisLock = new RedisLock(jedis);
         assertTrue(redisLock.acquireLock("lockKey", 1000L));
