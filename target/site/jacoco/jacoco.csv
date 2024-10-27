@@ -10,5 +10,5 @@ pdatabase,edu.cmu.cs.cloud,Config,31,0,0,0,9,0,3,0,3,0
 pdatabase,edu.cmu.cs.cloud,Memcached,36,0,2,0,9,0,5,0,4,0
 pdatabase,edu.cmu.cs.cloud,RedisLock,27,0,0,0,7,0,3,0,3,0
 pdatabase,edu.cmu.cs.cloud,ReservationApp,51,0,0,0,9,0,3,0,3,0
-pdatabase,edu.cmu.cs.cloud,Redis,0,287,1,35,0,67,1,29,0,12
+pdatabase,edu.cmu.cs.cloud,Redis,0,287,0,36,0,67,0,30,0,12
 pdatabase,edu.cmu.cs.cloud,MongoDBTasks,439,0,36,0,102,0,30,0,10,0
